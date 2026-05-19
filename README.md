@@ -59,7 +59,5 @@ Frontend runs on `http://localhost:5173`. Open it in your browser.
 
 ## What to add for production
 
-1. **Real market data** — Connect to TASE's official data API or a provider (Refinitiv, Alpha Vantage's TLV symbols, Yahoo Finance unofficial). Replace the simulated chart in `frontend/src/services/api.js`.
-2. **User accounts** — Add auth (Auth0, Clerk, or a custom JWT system). Persist watchlists to a database (Postgres + Prisma is a clean choice).
-3. **Caching layer** — Add Redis to cache analysis results per ticker for ~5 minutes. The backend has in-memory caching as a starting point.
-4. **Disclaimers** — This is not financial advice. Add prominent disclaimers per Israeli securities regulations before going live.
+ **Caching layer** — Add Redis to cache analysis results per ticker for ~5 minutes. The backend has in-memory caching as a starting point.
+
