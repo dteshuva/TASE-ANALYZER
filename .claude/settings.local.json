@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node test-yahoo.js)",
+      "Bash(netstat -tlnp)"
+    ]
+  }
+}
