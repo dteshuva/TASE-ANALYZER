@@ -1,6 +1,6 @@
 import express from 'express';
 import Anthropic from '@anthropic-ai/sdk';
-import { fetchYahooStockData, fetchYahooHistory, searchTASEStocks } from '../services/yahooFinance.js';
+import { loadTASEStock } from '../services/yahooFinance.js';
 
 const router = express.Router();
 
@@ -144,16 +144,19 @@ router.post('/', async (req, res, next) => {
       return res.end();
     }
 
+    // Accepts a ticker ("TEVA") or a company name ("bank leumi").
     let realPriceData, chartData;
     try {
-      [realPriceData, chartData] = await Promise.all([
-        fetchYahooStockData(query),
-        fetchYahooHistory(query),
-      ]);
+      const bundle = await loadTASEStock(query);
+      realPriceData = bundle.stockData;
+      chartData = bundle.chartData;
     } catch (yahooErr) {
       if (yahooErr.status === 404) {
-        const suggestions = await searchTASEStocks(query).catch(() => []);
-        sendEvent('error', { error: 'Symbol not found on TASE', suggestions, notFound: true });
+        sendEvent('error', {
+          error: 'Symbol not found on TASE',
+          suggestions: yahooErr.suggestions || [],
+          notFound: true,
+        });
       } else {
         sendEvent('error', { error: yahooErr.message || 'Market data unavailable' });
       }

@@ -1,5 +1,5 @@
 import express from 'express';
-import { fetchYahooStockData, fetchYahooHistory, searchTASEStocks } from '../services/yahooFinance.js';
+import { loadTASEStock } from '../services/yahooFinance.js';
 
 const router = express.Router();
 
@@ -11,16 +11,16 @@ router.post('/', async (req, res, next) => {
       return res.status(400).json({ error: 'Invalid query' });
     }
 
+    // Accepts a ticker ("TEVA") or a company name ("bank leumi").
     let stockData, chartData;
     try {
-      [stockData, chartData] = await Promise.all([
-        fetchYahooStockData(query),
-        fetchYahooHistory(query),
-      ]);
+      ({ stockData, chartData } = await loadTASEStock(query));
     } catch (yahooErr) {
       if (yahooErr.status === 404) {
-        const suggestions = await searchTASEStocks(query).catch(() => []);
-        return res.status(404).json({ error: 'Symbol not found on TASE', suggestions });
+        return res.status(404).json({
+          error: 'Symbol not found on TASE',
+          suggestions: yahooErr.suggestions || [],
+        });
       }
       return res.status(502).json({ error: yahooErr.message || 'Market data unavailable' });
     }
