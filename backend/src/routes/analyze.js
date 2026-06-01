@@ -8,7 +8,7 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-const MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-4-5';
+const MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-4-6';
 const CACHE_TTL = parseInt(process.env.CACHE_TTL_SECONDS || '300', 10) * 1000;
 
 const analysisCache = new Map();
