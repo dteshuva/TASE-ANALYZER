@@ -15,6 +15,9 @@ export default function Header() {
         <NavLink to="/" end className={({ isActive }) => 'nav-link' + (isActive ? ' active' : '')}>
           {t.nav.analyze}
         </NavLink>
+        <NavLink to="/compare" className={({ isActive }) => 'nav-link' + (isActive ? ' active' : '')}>
+          {t.nav.compare}
+        </NavLink>
         <NavLink to="/watchlist" className={({ isActive }) => 'nav-link' + (isActive ? ' active' : '')}>
           {t.nav.watchlist}
         </NavLink>

@@ -4,6 +4,8 @@ import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import analyzeRouter from './routes/analyze.js';
 import quoteRouter from './routes/quote.js';
+import quotesRouter from './routes/quotes.js';
+import searchRouter from './routes/search.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -44,6 +46,8 @@ app.get('/health', (req, res) => {
 
 // Mount routes
 app.use('/api/quote', quoteRouter);
+app.use('/api/quotes', quotesRouter);
+app.use('/api/search', searchRouter);
 app.use('/api/analyze', analyzeRouter);
 
 // Error handler

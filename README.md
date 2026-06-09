@@ -15,7 +15,7 @@ tase-analyzer/
 
 ## Quick start
 
-You need **Node.js 18+** and an **Anthropic API key** (get one at https://console.anthropic.com).
+You need **Node.js 22+** and an **Anthropic API key** (get one at https://console.anthropic.com).
 
 ### 1. Backend
 

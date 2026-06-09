@@ -1,0 +1,5 @@
+name: tase-analyzer-cloud
+config:
+  type: cloud
+  networking:
+    type: unrestricted

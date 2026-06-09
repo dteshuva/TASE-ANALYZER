@@ -19,6 +19,40 @@ export async function fetchQuote(query) {
   return res.json();
 }
 
+// Batch price lookup for the watchlist — one request for many tickers.
+// Returns { quotes: [{ ticker, currentPrice, priceChange, ... } | { ticker, error }] }.
+export async function fetchQuotes(tickers) {
+  const res = await fetch(`${API_URL}/api/quotes`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tickers }),
+  });
+
+  if (!res.ok) {
+    const errBody = await res.json().catch(() => ({}));
+    const err = new Error(errBody.error || `Request failed: ${res.status}`);
+    err.status = res.status;
+    throw err;
+  }
+
+  return res.json();
+}
+
+// Autocomplete search — returns { results: [{ ticker, name }] } for the search bar.
+export async function searchStocks(query) {
+  try {
+    const res = await fetch(`${API_URL}/api/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query }),
+    });
+    if (!res.ok) return { results: [] };
+    return res.json();
+  } catch {
+    return { results: [] };
+  }
+}
+
 // Streams /api/analyze as SSE. Returns a controller with an abort() method.
 // onProgress/onComplete/onError fire as the stream produces events.
 export function streamAnalysis(query, { onProgress, onComplete, onError } = {}) {

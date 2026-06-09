@@ -1,5 +1,11 @@
 import express from 'express';
-import { loadTASEStock } from '../services/yahooFinance.js';
+import {
+  loadTASEStock,
+  fetchBenchmark12mReturn,
+  trailing12mReturn,
+  fetchStockNews,
+  BENCHMARK_NAME,
+} from '../services/yahooFinance.js';
 
 const router = express.Router();
 
@@ -25,9 +31,32 @@ router.post('/', async (req, res, next) => {
       return res.status(502).json({ error: yahooErr.message || 'Market data unavailable' });
     }
 
+    const companyName = stockData.longName || stockData.shortName || stockData.ticker;
+    // Kick off news in parallel; it never throws (degrades to []).
+    const newsPromise = fetchStockNews(companyName);
+
+    // 12-month performance of the stock vs the TA-125 benchmark. Optional — a
+    // benchmark hiccup must never fail the quote, so it degrades to null.
+    let performance = null;
+    try {
+      const [benchmark, stockReturn] = await Promise.all([
+        fetchBenchmark12mReturn(),
+        trailing12mReturn(stockData.ticker, stockData.currentPrice),
+      ]);
+      if (benchmark != null && stockReturn != null) {
+        performance = { stock: stockReturn, benchmark, benchmarkName: BENCHMARK_NAME };
+      }
+    } catch {
+      performance = null;
+    }
+
+    const news = await newsPromise;
+
     res.json({
       ticker: stockData.ticker,
       companyName: stockData.longName || stockData.shortName || stockData.ticker,
+      sector: stockData.sector,
+      industry: stockData.industry,
       currentPrice: stockData.currentPrice,
       priceChange: stockData.priceChange,
       marketCap: stockData.marketCap != null
@@ -35,8 +64,13 @@ router.post('/', async (req, res, next) => {
         : null,
       high52: stockData.high52,
       low52: stockData.low52,
+      volume: stockData.volume,
+      avgVolume: stockData.avgVolume,
+      dividendYield: stockData.dividendYield,
       pe: stockData.pe != null ? String(stockData.pe) : 'N/A',
       currency: stockData.currency,
+      performance,
+      news,
       chartData,
     });
   } catch (err) {

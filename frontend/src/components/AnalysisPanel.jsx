@@ -46,12 +46,20 @@ export default function AnalysisPanel({ stock, loading, error }) {
 
   const fillColor = stock.bullishPct >= 50 ? 'var(--accent)' : 'var(--danger)';
 
+  // Conviction reflects how far the bullish probability sits from a 50/50 coin flip.
+  const convictionDist = Math.abs((stock.bullishPct ?? 50) - 50);
+  const convictionKey =
+    convictionDist >= 20 ? 'high' : convictionDist >= 10 ? 'moderate' : 'low';
+
   return (
     <div className="card">
       <div className="card-title">{t.analysis.title}</div>
-      <div className="ai-badge">
-        <span className="ai-dot" />
-        {t.analysis.poweredBy}
+      <div className="badge-row">
+        <div className="ai-badge">
+          <span className="ai-dot" />
+          {t.analysis.poweredBy}
+        </div>
+        {stock.cached && <div className="cached-badge">{t.analysis.cachedResult}</div>}
       </div>
 
       <div className="analysis-text">
@@ -73,17 +81,20 @@ export default function AnalysisPanel({ stock, loading, error }) {
             {stock.bullishPct}%
           </div>
         </div>
-        <div className={'verdict ' + verdictClass}>{verdictLabel}</div>
+        <div className="verdict-row">
+          <div className={'verdict ' + verdictClass}>{verdictLabel}</div>
+          <span className="conviction-label">{t.analysis.conviction[convictionKey]}</span>
+        </div>
       </div>
 
       <div className="targets">
         <div className="target">
           <div className="target-label">{t.analysis.targetBear}</div>
-          <div className="target-val down">{stock.targetBear}</div>
+          <div className="target-val down">{stock.targetBear?.toLocaleString?.() ?? stock.targetBear}</div>
         </div>
         <div className="target">
           <div className="target-label">{t.analysis.targetBull}</div>
-          <div className="target-val up">{stock.targetBull}</div>
+          <div className="target-val up">{stock.targetBull?.toLocaleString?.() ?? stock.targetBull}</div>
         </div>
       </div>
 

@@ -229,6 +229,9 @@ router.post('/', async (req, res, next) => {
       ...parsed,
       cached: false,
       companyName: realPriceData.longName || realPriceData.shortName || parsed.companyName,
+      // Prefer Yahoo's sourced sector; fall back to the AI's only if Yahoo has none.
+      sector: realPriceData.sector ?? parsed.sector,
+      industry: realPriceData.industry ?? null,
       currentPrice: realPriceData.currentPrice ?? parsed.currentPrice,
       priceChange: realPriceData.priceChange ?? parsed.priceChange,
       high52: realPriceData.high52 ?? parsed.high52,

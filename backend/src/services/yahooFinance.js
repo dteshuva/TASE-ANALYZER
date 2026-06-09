@@ -57,11 +57,41 @@ export async function fetchYahooHistory(ticker) {
   return cachedFetch(historyCache, formattedTicker, () => doFetchHistory(formattedTicker));
 }
 
+// Trailing 12-month return (%), point-to-point: the live price vs the daily close
+// ~52 weeks ago. Computed from daily data + the current price because Yahoo's
+// monthly bars are too coarse at the window edges (they skip the latest weeks and
+// overshoot the start) and its defaultKeyStatistics "52WeekChange" field is
+// inconsistently scaled (a fraction for equities, already a percent for indices).
+export async function trailing12mReturn(formattedTicker, currentPrice) {
+  if (currentPrice == null) return null;
+  const period2 = new Date();
+  const period1 = new Date();
+  period1.setFullYear(period1.getFullYear() - 1);
+
+  let result;
+  try {
+    result = await withRetry(() =>
+      yf.chart(formattedTicker, {
+        period1: period1.toISOString().slice(0, 10),
+        period2: period2.toISOString().slice(0, 10),
+        interval: '1d',
+      })
+    );
+  } catch {
+    return null; // a returns figure is supplementary — never fail the quote over it
+  }
+
+  const closes = (result.quotes || []).filter((q) => q.close != null);
+  const firstClose = closes[0]?.close;
+  if (!firstClose) return null;
+  return +(((currentPrice - firstClose) / firstClose) * 100).toFixed(1);
+}
+
 async function doFetchStock(formattedTicker) {
   let result;
   try {
     result = await withRetry(() =>
-      yf.quoteSummary(formattedTicker, { modules: ['price', 'summaryDetail'] })
+      yf.quoteSummary(formattedTicker, { modules: ['price', 'summaryDetail', 'assetProfile'] })
     );
   } catch (err) {
     const notFound = /not found|no fundamentals/i.test(err.message);
@@ -72,6 +102,7 @@ async function doFetchStock(formattedTicker) {
 
   const price = result.price || {};
   const summary = result.summaryDetail || {};
+  const profile = result.assetProfile || {};
 
   // Prices from Yahoo Finance for TASE are in ILA (agorot).
   return {
@@ -85,6 +116,14 @@ async function doFetchStock(formattedTicker) {
     marketCap: summary.marketCap ?? null,
     high52: summary.fiftyTwoWeekHigh ?? null,
     low52: summary.fiftyTwoWeekLow ?? null,
+    volume: price.regularMarketVolume ?? summary.volume ?? null,
+    avgVolume: summary.averageVolume ?? summary.averageDailyVolume3Month ?? null,
+    // Yahoo reports dividendYield as a decimal fraction (e.g. 0.0372 = 3.72%).
+    dividendYield: summary.dividendYield ?? null,
+    // Sourced sector/industry from Yahoo (GICS) — far more reliable than the
+    // AI-guessed sector, especially for Israel-only names.
+    sector: profile.sector ?? null,
+    industry: profile.industry ?? null,
     pe: summary.trailingPE != null ? +summary.trailingPE.toFixed(2) : null,
     currency: 'ILA',
     timestamp: new Date().toISOString(),
@@ -122,14 +161,55 @@ async function doFetchHistory(formattedTicker) {
     }));
 }
 
+// The TA-125 is the headline TASE benchmark index. Its trailing 52-week return
+// barely moves between requests, so cache it for an hour and share it across quotes.
+export const BENCHMARK_NAME = 'TA-125';
+const BENCHMARK_SYMBOL = '^TA125.TA';
+const BENCHMARK_TTL = 60 * 60 * 1000;
+let benchmarkCache = { value: null, timestamp: 0 };
+
+export async function fetchBenchmark12mReturn() {
+  if (benchmarkCache.value != null && Date.now() - benchmarkCache.timestamp < BENCHMARK_TTL) {
+    return benchmarkCache.value;
+  }
+  const idx = await fetchYahooStockData(BENCHMARK_SYMBOL);
+  const ret = await trailing12mReturn(BENCHMARK_SYMBOL, idx.currentPrice);
+  if (ret != null) benchmarkCache = { value: ret, timestamp: Date.now() };
+  return ret;
+}
+
+// Recent news headlines for a company, via Yahoo's search endpoint. Best-effort:
+// news is supplementary, so any failure degrades to an empty list.
+export async function fetchStockNews(query) {
+  if (!query) return [];
+  try {
+    const result = await withRetry(() => yf.search(query, {}, { validateResult: false }));
+    return (result.news || [])
+      .filter((n) => n.title && n.link)
+      .slice(0, 4)
+      .map((n) => ({
+        title: n.title,
+        publisher: n.publisher || null,
+        link: n.link,
+        time: n.providerPublishTime ? new Date(n.providerPublishTime).toISOString() : null,
+      }));
+  } catch {
+    return [];
+  }
+}
+
 export async function searchTASEStocks(query) {
   // validateResult:false — Yahoo's /search payload (news, navigation, etc.) does
   // NOT pass yahoo-finance2's strict schema even with allowAdditionalProps, so the
   // default would throw "Failed Yahoo Schema validation" and we'd lose all matches.
-  const result = await withRetry(() => yf.search(query, {}, { validateResult: false }));
+  // Request a wider candidate pool — Yahoo ranks foreign listings above the .TA
+  // ones for generic terms, so the default (~6) often contains no TASE matches.
+  const result = await withRetry(() =>
+    yf.search(query, { quotesCount: 20, newsCount: 0 }, { validateResult: false })
+  );
   return (result.quotes || [])
     .filter((q) => q.symbol?.endsWith('.TA') && q.quoteType === 'EQUITY')
-    .slice(0, 4)
+    .slice(0, 6)
     .map((q) => ({
       ticker: q.symbol.replace('.TA', ''),
       name: q.shortname || q.longname || q.symbol,

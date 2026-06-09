@@ -41,7 +41,9 @@ export default function StockCard({ stock }) {
         <div className="stock-meta">
           <div className="stock-name">{displayName}</div>
           <div className="stock-ticker">{stock.ticker} · TASE</div>
-          {stock.sector && <div className="stock-sector">{stock.sector}</div>}
+          {stock.sector && (
+            <div className="stock-sector" title={stock.industry || undefined}>{stock.sector}</div>
+          )}
         </div>
         <div className="price-block">
           <div className="price">{stock.currentPrice?.toLocaleString()}</div>
@@ -58,6 +60,7 @@ export default function StockCard({ stock }) {
         </div>
       </div>
 
+      <div className="chart-title">{t.stock.chartTitle}</div>
       <div className="chart-wrap">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
@@ -119,12 +122,59 @@ export default function StockCard({ stock }) {
         </ResponsiveContainer>
       </div>
 
+      {stock.performance && (
+        <div className="perf-row">
+          <span className="perf-label">{t.stock.return12m}</span>
+          <span className={'perf-val ' + (stock.performance.stock >= 0 ? 'up' : 'down')}>
+            {stock.performance.stock >= 0 ? '+' : ''}{stock.performance.stock}%
+          </span>
+          <span className="perf-bench">
+            {t.stock.vs} {stock.performance.benchmarkName}{' '}
+            <span className={stock.performance.benchmark >= 0 ? 'up' : 'down'}>
+              {stock.performance.benchmark >= 0 ? '+' : ''}{stock.performance.benchmark}%
+            </span>
+          </span>
+        </div>
+      )}
+
       <div className="metrics">
         <Metric label={t.stock.marketCap} value={stock.marketCap} />
         <Metric label={t.stock.pe} value={stock.pe} />
         <Metric label={t.stock.high52} value={stock.high52?.toLocaleString?.() ?? stock.high52} />
         <Metric label={t.stock.low52} value={stock.low52?.toLocaleString?.() ?? stock.low52} />
+        <Metric label={t.stock.volume} value={stock.volume != null ? stock.volume.toLocaleString() : null} />
+        {stock.avgVolume != null && (
+          <Metric label={t.stock.avgVolume} value={stock.avgVolume.toLocaleString()} />
+        )}
+        {stock.dividendYield != null && (
+          <Metric label={t.stock.dividendYield} value={(stock.dividendYield * 100).toFixed(2) + '%'} />
+        )}
       </div>
+
+      {stock.news?.length > 0 && (
+        <div className="news-section">
+          <div className="news-title">{t.stock.news}</div>
+          <ul className="news-list">
+            {stock.news.map((n, i) => (
+              <li className="news-item" key={i}>
+                <a className="news-link" href={n.link} target="_blank" rel="noopener noreferrer">
+                  {n.title}
+                </a>
+                <div className="news-meta">
+                  {n.publisher}
+                  {n.publisher && n.time ? ' · ' : ''}
+                  {n.time
+                    ? new Date(n.time).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                      })
+                    : ''}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
