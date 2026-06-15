@@ -57,8 +57,8 @@ export async function fetchYahooHistory(ticker) {
   return cachedFetch(historyCache, formattedTicker, () => doFetchHistory(formattedTicker));
 }
 
-// Trailing 12-month return (%), point-to-point: the live price vs the daily close
-// ~52 weeks ago. Computed from daily data + the current price because Yahoo's
+// Trailing 12-month PRICE return (%), point-to-point: the live price vs the daily
+// close ~52 weeks ago. Computed from daily data + the current price because Yahoo's
 // monthly bars are too coarse at the window edges (they skip the latest weeks and
 // overshoot the start) and its defaultKeyStatistics "52WeekChange" field is
 // inconsistently scaled (a fraction for equities, already a percent for indices).
@@ -81,10 +81,20 @@ export async function trailing12mReturn(formattedTicker, currentPrice) {
     return null; // a returns figure is supplementary — never fail the quote over it
   }
 
-  const closes = (result.quotes || []).filter((q) => q.close != null);
-  const firstClose = closes[0]?.close;
-  if (!firstClose) return null;
-  return +(((currentPrice - firstClose) / firstClose) * 100).toFixed(1);
+  const closes = (result.quotes || []).filter((q) => q.close != null).map((q) => q.close);
+  if (closes.length < 2) return null;
+  // Baseline = the ACTUAL window-start close, so a fast first week doesn't inflate
+  // it (a median-of-first-5 baseline sat ~5% high on stocks that ran up early).
+  // Guard against Yahoo's occasional bogus opening tick (e.g. TSEM showing a wild
+  // ~14500 vs a real ~3000): if the first close is way off the median of the next
+  // few, it's a glitch — fall back to that median.
+  const first = closes[0];
+  const next = closes.slice(1, 6).sort((a, b) => a - b);
+  const med = next[Math.floor(next.length / 2)];
+  const baseline = med && Math.abs(first - med) / med > 0.5 ? med : first;
+  if (!baseline) return null;
+
+  return +(((currentPrice - baseline) / baseline) * 100).toFixed(1);
 }
 
 async function doFetchStock(formattedTicker) {

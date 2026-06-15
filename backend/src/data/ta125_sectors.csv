@@ -1,0 +1,126 @@
+Symbol,Name,Sector,Subsector
+TSEM,TOWER,Technology,Semiconductors
+TEVA,TEVA,Health Care,Pharmaceuticals
+NVMI,NOVA,Technology,Semiconductor Equipment
+ESLT,ELBIT SYSTEMS,Industrials,Aerospace & Defense
+LUMI,LEUMI,Financials,Banks
+POLI,POALIM,Financials,Banks
+PHOE,PHOENIX,Financials,Insurance
+ENLT,ENLIGHT ENERGY,Utilities,Renewable Electricity
+DSCT,DISCOUNT,Financials,Banks
+MZTF,MIZRAHI TEFAHOT,Financials,Banks
+ORA,ORMAT TECHNO,Utilities,Renewable Electricity
+BEZQ,BEZEQ,Communication Services,Telecommunication Services
+HARL,HAREL,Financials,Insurance
+NXSN,NEXT VISION,Industrials,Aerospace & Defense
+CLIS,CLAL INSURANCE,Financials,Insurance
+OPCE,OPC ENERGY,Utilities,Independent Power Producers
+AZRG,AZRIELI GROUP,Real Estate,Diversified REITs
+NICE,NICE,Technology,Software
+CAMT,CAMTEK,Technology,Semiconductor Equipment
+MGOR,MEGA OR,Real Estate,Real Estate Development
+NVPT,NAVITAS PTRO PU,Energy,Oil & Gas Exploration & Production
+TASE,TASE,Financials,Financial Exchanges
+ICL,ICL,Materials,Fertilizers & Agricultural Chemicals
+FIBI,FIBI BANK,Financials,Banks
+BIG,BIG,Real Estate,Retail REITs
+MMHD,MENORA MIV HLD,Financials,Insurance
+MGDL,MIGDAL INSUR.,Financials,Insurance
+MLSR,MELISRON,Real Estate,Retail REITs
+NWMD,NEWMED ENERG PU,Energy,Oil & Gas Exploration & Production
+SAE,SHUFERSAL,Consumer Staples,Food Retail
+DORL,DORAL ENERGY,Utilities,Renewable Electricity
+PAZ,PAZ ENERGY,Energy,Oil & Gas Refining & Marketing
+DLEKG,DELEK GROUP,Energy,Integrated Oil & Gas
+MVNE,MIVNE,Real Estate,Industrial REITs
+STRS,STRAUSS GROUP,Consumer Staples,Packaged Foods
+BSEN,BET SHEMESH,Industrials,Aerospace & Defense
+SKBN,SHIKUN & BINUI,Industrials,Construction & Engineering
+ENRG,ENERGIX,Utilities,Renewable Electricity
+SPEN,SHAPIR ENG,Industrials,Construction & Engineering
+NOFR,NOFAR ENERGY,Utilities,Renewable Electricity
+PTNR,PARTNER,Communication Services,Wireless Telecommunication Services
+MTAV,MEITAV INVEST,Financials,Asset Management & Custody Banks
+ALHE,ALONY HETZ,Real Estate,Diversified REITs
+AMOT,AMOT,Real Estate,Diversified REITs
+TRPZ,TURPAZ,Materials,Specialty Chemicals
+FTAL,FATTAL HOLD,Consumer Discretionary,"Hotels, Resorts & Cruise Lines"
+ELAL,EL AL,Industrials,Airlines
+GNRS,GENERATION CAP,Financials,Multi-Sector Holdings
+MTRX,MATRIX,Technology,IT Services
+FIBIH,FIBI HOLDINGS,Financials,Banks
+MAXO,MAX STOCK,Consumer Discretionary,Specialty Retail
+ENOG,ENERGEAN,Energy,Oil & Gas Exploration & Production
+ELTR,ELECTRA,Industrials,Construction & Engineering
+RIT1,REIT 1,Real Estate,Diversified REITs
+HLAN,HILAN,Technology,IT Services
+KEN,KENON,Utilities,Independent Power Producers
+MSKE,MESHEK ENERGY,Utilities,Renewable Electricity
+ILCO,ISRAEL CORP,Financials,Multi-Sector Holdings
+CEL,CELLCOM,Communication Services,Wireless Telecommunication Services
+GILT,GILAT,Technology,Communications Equipment
+RATI,RATIO PU,Energy,Oil & Gas Exploration & Production
+DIMRI,DIMRI,Real Estate,Real Estate Development
+ISRA,ISRAMCO PU,Energy,Oil & Gas Exploration & Production
+QLTU,QUALITAU,Technology,Semiconductor Equipment
+ORL,BAZAN,Energy,Oil & Gas Refining & Marketing
+FORTY,FORMULA,Technology,IT Services
+ISCN,ISRAEL CANADA,Real Estate,Real Estate Development
+ONE,ONE TECHNOLOGI,Technology,IT Services
+ASHG,ASHTROM GROUP,Industrials,Construction & Engineering
+RMLI,RAMI LEVI,Consumer Staples,Food Retail
+NYAX,NAYAX,Technology,Data Processing & Outsourced Services
+ARPT,AIRPORT CITY,Real Estate,Diversified REITs
+ARGO,ARGO PROP.,Real Estate,Diversified REITs
+AURA,AURA,Real Estate,Real Estate Development
+INRM,INROM CONST,Materials,Construction Materials
+SLARL,SELLA REAL EST,Real Estate,Diversified REITs
+PRTC,PRIORTECH,Technology,Electronic Components
+FOX,FOX,Consumer Discretionary,Apparel Retail
+GVYM,GAV YAM,Real Estate,Office REITs
+MISH,MIVTACH SHAMIR,Financials,Multi-Sector Holdings
+ISRO,ISROTEL,Consumer Discretionary,"Hotels, Resorts & Cruise Lines"
+ISCD,ISRACARD,Financials,Consumer Finance
+ARYT,ARYT,Industrials,Aerospace & Defense
+KSTN,KEYSTONE INFRA,Financials,Multi-Sector Holdings
+DANE,DANEL,Industrials,Diversified Support Services
+MRIN,MORE INVEST,Financials,Asset Management & Custody Banks
+IBI,IBI INV HOUSE,Financials,Asset Management & Custody Banks
+IDIN,IDI INSUR,Financials,Insurance
+VRDS,VERIDIS,Industrials,Environmental & Facilities Services
+BLSR,BLUE SQ REAL ES,Real Estate,Real Estate Development
+AYAL,AYALON HOLD.,Financials,Insurance
+NTML,NETO MALINDA,Consumer Staples,Packaged Foods
+DNYA,DANYA CEBUS,Industrials,Construction & Engineering
+RMON,RIMON,Materials,Construction Materials
+ELCRE,ELECTRA REAL E.,Real Estate,Diversified REITs
+EQTL,EQUITAL,Energy,Oil & Gas Exploration & Production
+CRSM,CARASSO MOTORS,Consumer Discretionary,Automotive Retail
+YHNF,YOCHANANOF,Consumer Staples,Food Retail
+DELG,DELTA GALIL,Consumer Discretionary,"Apparel, Accessories & Luxury Goods"
+AFPR,AFI PROPERTIES,Real Estate,Diversified REITs
+SCOP,SCOPE,Materials,Specialty Chemicals
+SMT,SUMMIT,Real Estate,Diversified REITs
+ECNR,ECONERGY,Utilities,Renewable Electricity
+ACRO,ACRO KVUT,Real Estate,Real Estate Development
+IES,IES,Real Estate,Real Estate Development
+AFRE,AFRICA RESIDENC,Real Estate,Real Estate Development
+AZRM,AZORIM,Real Estate,Real Estate Development
+ELCO,ELCO,Consumer Discretionary,Household Appliances
+SBEN,SHIKN&BINUI ENE,Utilities,Renewable Electricity
+RPOL,RP OPTICAL,Industrials,Aerospace & Defense
+LAPD,LAPIDOTH CAP.,Energy,Oil & Gas Exploration & Production
+PRSK,PRASHKOVSKY,Real Estate,Real Estate Development
+AMRM,AMRM,Real Estate,Real Estate Development
+OPK,OPKO HEALTH,Health Care,Biotechnology
+ISRS,ISRAS,Real Estate,Diversified REITs
+LAHAV,LAHAV,Financials,Multi-Sector Holdings
+AMPA,AMPA,Financials,Multi-Sector Holdings
+PTBL,PROPERT & BUIL,Real Estate,Diversified REITs
+ISHI,ISRAEL SHIPYARD,Industrials,Aerospace & Defense
+VILR,VILLAR,Real Estate,Real Estate Development
+DLTI,DELTA BRANDS,Consumer Discretionary,"Apparel, Accessories & Luxury Goods"
+TMRP,TAMAR PET,Energy,Oil & Gas Exploration & Production
+ACKR,ACKERSTEIN GRP.,Materials,Construction Materials
+WESR,WESURE GLOBALT,Financials,Insurance
+UNMI,UNIVERSAL,Industrials,Industrial Machinery

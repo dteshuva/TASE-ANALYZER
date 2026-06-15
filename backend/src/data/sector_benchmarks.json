@@ -1,0 +1,757 @@
+{
+  "Banks": {
+    "sector": "Banks",
+    "label": "Banks",
+    "computedAt": 1781545863507,
+    "window": {
+      "months": 12
+    },
+    "weighting": "official-weighted",
+    "basketSize": 6,
+    "constituentCount": 6,
+    "constituents": [
+      {
+        "ticker": "LUMI",
+        "weight": 25.94,
+        "return": 14.7
+      },
+      {
+        "ticker": "POLI",
+        "weight": 25.26,
+        "return": 15.9
+      },
+      {
+        "ticker": "DSCT",
+        "weight": 21.3,
+        "return": -2.8
+      },
+      {
+        "ticker": "MZTF",
+        "weight": 18.23,
+        "return": 2.3
+      },
+      {
+        "ticker": "FIBI",
+        "weight": 6.95,
+        "return": 6
+      },
+      {
+        "ticker": "FIBIH",
+        "weight": 2.32,
+        "return": 27.9
+      }
+    ],
+    "return12m": 8.7,
+    "series": null
+  },
+  "Technology": {
+    "sector": "Technology",
+    "label": "Technology",
+    "computedAt": 1781545862508,
+    "window": {
+      "months": 12
+    },
+    "weighting": "official-weighted",
+    "basketSize": 12,
+    "constituentCount": 11,
+    "constituents": [
+      {
+        "ticker": "NVMI",
+        "weight": 31.23,
+        "return": 120.3
+      },
+      {
+        "ticker": "NICE",
+        "weight": 10.12,
+        "return": -56.5
+      },
+      {
+        "ticker": "CAMT",
+        "weight": 9.47,
+        "return": 119.7
+      },
+      {
+        "ticker": "MTRX",
+        "weight": 2.59,
+        "return": -21
+      },
+      {
+        "ticker": "HLAN",
+        "weight": 2.18,
+        "return": -19.3
+      },
+      {
+        "ticker": "GILT",
+        "weight": 1.98,
+        "return": 87.1
+      },
+      {
+        "ticker": "QLTU",
+        "weight": 1.75,
+        "return": 71.1
+      },
+      {
+        "ticker": "FORTY",
+        "weight": 1.71,
+        "return": -10.4
+      },
+      {
+        "ticker": "ONE",
+        "weight": 1.67,
+        "return": -16.6
+      },
+      {
+        "ticker": "NYAX",
+        "weight": 1.51,
+        "return": 24.6
+      },
+      {
+        "ticker": "PRTC",
+        "weight": 1.26,
+        "return": 96.4
+      }
+    ],
+    "return12m": 70.8,
+    "series": null
+  },
+  "Health Care": {
+    "sector": "Health Care",
+    "label": "Health Care",
+    "computedAt": 1781545862720,
+    "window": {
+      "months": 12
+    },
+    "weighting": "official-weighted",
+    "basketSize": 2,
+    "constituentCount": 2,
+    "constituents": [
+      {
+        "ticker": "TEVA",
+        "weight": 98.96,
+        "return": 62.6
+      },
+      {
+        "ticker": "OPK",
+        "weight": 1.04,
+        "return": -13.6
+      }
+    ],
+    "return12m": 61.8,
+    "series": null
+  },
+  "Industrials": {
+    "sector": "Industrials",
+    "label": "Industrials",
+    "computedAt": 1781545863277,
+    "window": {
+      "months": 12
+    },
+    "weighting": "official-weighted",
+    "basketSize": 15,
+    "constituentCount": 13,
+    "constituents": [
+      {
+        "ticker": "ESLT",
+        "weight": 44.8955,
+        "return": 49.1
+      },
+      {
+        "ticker": "BSEN",
+        "weight": 6.9193,
+        "return": 74.5
+      },
+      {
+        "ticker": "SKBN",
+        "weight": 6.8793,
+        "return": 53.7
+      },
+      {
+        "ticker": "SPEN",
+        "weight": 6.3094,
+        "return": 55.2
+      },
+      {
+        "ticker": "ELAL",
+        "weight": 4.2196,
+        "return": 0.1
+      },
+      {
+        "ticker": "ELTR",
+        "weight": 3.3797,
+        "return": 19.7
+      },
+      {
+        "ticker": "ASHG",
+        "weight": 2.4597,
+        "return": 9.1
+      },
+      {
+        "ticker": "ARYT",
+        "weight": 1.7998,
+        "return": 24.2
+      },
+      {
+        "ticker": "DANE",
+        "weight": 1.6098,
+        "return": 8.7
+      },
+      {
+        "ticker": "VRDS",
+        "weight": 1.4199,
+        "return": 86.8
+      },
+      {
+        "ticker": "DNYA",
+        "weight": 1.2299,
+        "return": 9.9
+      },
+      {
+        "ticker": "ISHI",
+        "weight": 0.4,
+        "return": 5.3
+      },
+      {
+        "ticker": "UNMI",
+        "weight": 0.13,
+        "return": 3.3
+      }
+    ],
+    "return12m": 45.6,
+    "series": null
+  },
+  "Insurance": {
+    "sector": "Insurance",
+    "label": "Insurance",
+    "computedAt": 1781545863834,
+    "window": {
+      "months": 12
+    },
+    "weighting": "official-weighted",
+    "basketSize": 8,
+    "constituentCount": 8,
+    "constituents": [
+      {
+        "ticker": "PHOE",
+        "weight": 38.7361,
+        "return": 103.2
+      },
+      {
+        "ticker": "HARL",
+        "weight": 19.568,
+        "return": 118.2
+      },
+      {
+        "ticker": "CLIS",
+        "weight": 17.6782,
+        "return": 101.2
+      },
+      {
+        "ticker": "MMHD",
+        "weight": 10.4989,
+        "return": 133.9
+      },
+      {
+        "ticker": "MGDL",
+        "weight": 10.359,
+        "return": 126.8
+      },
+      {
+        "ticker": "IDIN",
+        "weight": 1.5099,
+        "return": 17.2
+      },
+      {
+        "ticker": "AYAL",
+        "weight": 1.3699,
+        "return": 166.1
+      },
+      {
+        "ticker": "WESR",
+        "weight": 0.28,
+        "return": 172.3
+      }
+    ],
+    "return12m": 111.2,
+    "series": null
+  },
+  "Utilities": {
+    "sector": "Utilities",
+    "label": "Utilities",
+    "computedAt": 1781545864777,
+    "window": {
+      "months": 12
+    },
+    "weighting": "official-weighted",
+    "basketSize": 10,
+    "constituentCount": 7,
+    "constituents": [
+      {
+        "ticker": "ORA",
+        "weight": 21.4021,
+        "return": 42.7
+      },
+      {
+        "ticker": "OPCE",
+        "weight": 15.9616,
+        "return": 154.2
+      },
+      {
+        "ticker": "ENRG",
+        "weight": 6.4406,
+        "return": 114.3
+      },
+      {
+        "ticker": "NOFR",
+        "weight": 5.6106,
+        "return": 118.1
+      },
+      {
+        "ticker": "KEN",
+        "weight": 3.0803,
+        "return": 60.4
+      },
+      {
+        "ticker": "ECNR",
+        "weight": 0.8201,
+        "return": 94.9
+      },
+      {
+        "ticker": "SBEN",
+        "weight": 0.6901,
+        "return": 48.6
+      }
+    ],
+    "return12m": 93.9,
+    "series": null
+  },
+  "Communication Services": {
+    "sector": "Communication Services",
+    "label": "Communication Services",
+    "computedAt": 1781545864960,
+    "window": {
+      "months": 12
+    },
+    "weighting": "official-weighted",
+    "basketSize": 3,
+    "constituentCount": 3,
+    "constituents": [
+      {
+        "ticker": "BEZQ",
+        "weight": 68.38,
+        "return": 34.1
+      },
+      {
+        "ticker": "PTNR",
+        "weight": 20.61,
+        "return": 67.2
+      },
+      {
+        "ticker": "CEL",
+        "weight": 11.01,
+        "return": 39.6
+      }
+    ],
+    "return12m": 41.5,
+    "series": null
+  },
+  "Real Estate": {
+    "sector": "Real Estate",
+    "label": "Real Estate",
+    "computedAt": 1781545866163,
+    "window": {
+      "months": 12
+    },
+    "weighting": "official-weighted",
+    "basketSize": 28,
+    "constituentCount": 25,
+    "constituents": [
+      {
+        "ticker": "AZRG",
+        "weight": 17.1834,
+        "return": 53.4
+      },
+      {
+        "ticker": "BIG",
+        "weight": 11.4323,
+        "return": 17.5
+      },
+      {
+        "ticker": "MLSR",
+        "weight": 9.7019,
+        "return": 22.9
+      },
+      {
+        "ticker": "MVNE",
+        "weight": 7.6715,
+        "return": 18.6
+      },
+      {
+        "ticker": "ALHE",
+        "weight": 5.2711,
+        "return": 15.6
+      },
+      {
+        "ticker": "AMOT",
+        "weight": 4.6809,
+        "return": -5.4
+      },
+      {
+        "ticker": "RIT1",
+        "weight": 3.4407,
+        "return": 4.3
+      },
+      {
+        "ticker": "DIMRI",
+        "weight": 3.0206,
+        "return": 3.9
+      },
+      {
+        "ticker": "ISCN",
+        "weight": 2.6005,
+        "return": 44.7
+      },
+      {
+        "ticker": "ARPT",
+        "weight": 2.2204,
+        "return": -4.2
+      },
+      {
+        "ticker": "ARGO",
+        "weight": 2.1704,
+        "return": 24.3
+      },
+      {
+        "ticker": "AURA",
+        "weight": 2.1504,
+        "return": -14.6
+      },
+      {
+        "ticker": "SLARL",
+        "weight": 2.1304,
+        "return": -2
+      },
+      {
+        "ticker": "GVYM",
+        "weight": 1.9304,
+        "return": 14.7
+      },
+      {
+        "ticker": "BLSR",
+        "weight": 1.4003,
+        "return": 9.4
+      },
+      {
+        "ticker": "ELCRE",
+        "weight": 1.1702,
+        "return": 5.4
+      },
+      {
+        "ticker": "AFPR",
+        "weight": 0.9502,
+        "return": -5.5
+      },
+      {
+        "ticker": "SMT",
+        "weight": 0.9102,
+        "return": -17.1
+      },
+      {
+        "ticker": "ACRO",
+        "weight": 0.7902,
+        "return": -7.2
+      },
+      {
+        "ticker": "AFRE",
+        "weight": 0.7702,
+        "return": -15.2
+      },
+      {
+        "ticker": "AZRM",
+        "weight": 0.7702,
+        "return": -12.5
+      },
+      {
+        "ticker": "PRSK",
+        "weight": 0.6601,
+        "return": 40.4
+      },
+      {
+        "ticker": "ISRS",
+        "weight": 0.5401,
+        "return": -2.6
+      },
+      {
+        "ticker": "PTBL",
+        "weight": 0.4101,
+        "return": 17.3
+      },
+      {
+        "ticker": "VILR",
+        "weight": 0.3701,
+        "return": 1.6
+      }
+    ],
+    "return12m": 20.4,
+    "series": null
+  },
+  "Energy": {
+    "sector": "Energy",
+    "label": "Energy",
+    "computedAt": 1781545866579,
+    "window": {
+      "months": 12
+    },
+    "weighting": "official-weighted",
+    "basketSize": 11,
+    "constituentCount": 8,
+    "constituents": [
+      {
+        "ticker": "NWMD",
+        "weight": 16.9317,
+        "return": 11.1
+      },
+      {
+        "ticker": "PAZ",
+        "weight": 15.6216,
+        "return": 44.8
+      },
+      {
+        "ticker": "DLEKG",
+        "weight": 14.5715,
+        "return": 26.2
+      },
+      {
+        "ticker": "ENOG",
+        "weight": 6.5307,
+        "return": -31.3
+      },
+      {
+        "ticker": "ORL",
+        "weight": 5.0705,
+        "return": 68
+      },
+      {
+        "ticker": "EQTL",
+        "weight": 2.0802,
+        "return": -22.3
+      },
+      {
+        "ticker": "LAPD",
+        "weight": 1.2701,
+        "return": 8
+      },
+      {
+        "ticker": "TMRP",
+        "weight": 0.6801,
+        "return": -33.7
+      }
+    ],
+    "return12m": 21.5,
+    "series": null
+  },
+  "Financials": {
+    "sector": "Financials",
+    "label": "Financial Services",
+    "computedAt": 1781545866968,
+    "window": {
+      "months": 12
+    },
+    "weighting": "official-weighted",
+    "basketSize": 11,
+    "constituentCount": 10,
+    "constituents": [
+      {
+        "ticker": "TASE",
+        "weight": 35.95,
+        "return": 133.4
+      },
+      {
+        "ticker": "MTAV",
+        "weight": 15.53,
+        "return": 123.4
+      },
+      {
+        "ticker": "GNRS",
+        "weight": 11.76,
+        "return": 190.3
+      },
+      {
+        "ticker": "ILCO",
+        "weight": 9.29,
+        "return": -25.1
+      },
+      {
+        "ticker": "MISH",
+        "weight": 5.49,
+        "return": 70.5
+      },
+      {
+        "ticker": "ISCD",
+        "weight": 5.28,
+        "return": -24.6
+      },
+      {
+        "ticker": "KSTN",
+        "weight": 4.89,
+        "return": 184.2
+      },
+      {
+        "ticker": "MRIN",
+        "weight": 4.62,
+        "return": 125.3
+      },
+      {
+        "ticker": "IBI",
+        "weight": 4.49,
+        "return": 118.8
+      },
+      {
+        "ticker": "LAHAV",
+        "weight": 1.5,
+        "return": 122.6
+      }
+    ],
+    "return12m": 113.1,
+    "series": null
+  },
+  "Materials": {
+    "sector": "Materials",
+    "label": "Materials",
+    "computedAt": 1781545867225,
+    "window": {
+      "months": 12
+    },
+    "weighting": "official-weighted",
+    "basketSize": 6,
+    "constituentCount": 6,
+    "constituents": [
+      {
+        "ticker": "ICL",
+        "weight": 56.7343,
+        "return": -28.9
+      },
+      {
+        "ticker": "TRPZ",
+        "weight": 21.1479,
+        "return": 98
+      },
+      {
+        "ticker": "INRM",
+        "weight": 10.189,
+        "return": 51
+      },
+      {
+        "ticker": "RMON",
+        "weight": 5.8294,
+        "return": 166.2
+      },
+      {
+        "ticker": "SCOP",
+        "weight": 4.4595,
+        "return": 94.3
+      },
+      {
+        "ticker": "ACKR",
+        "weight": 1.6399,
+        "return": 5.1
+      }
+    ],
+    "return12m": 23.5,
+    "series": null
+  },
+  "Consumer Staples": {
+    "sector": "Consumer Staples",
+    "label": "Consumer Staples",
+    "computedAt": 1781545867432,
+    "window": {
+      "months": 12
+    },
+    "weighting": "official-weighted",
+    "basketSize": 5,
+    "constituentCount": 5,
+    "constituents": [
+      {
+        "ticker": "SAE",
+        "weight": 42.3442,
+        "return": 13.5
+      },
+      {
+        "ticker": "STRS",
+        "weight": 34.6835,
+        "return": 38
+      },
+      {
+        "ticker": "RMLI",
+        "weight": 11.8712,
+        "return": 19.7
+      },
+      {
+        "ticker": "NTML",
+        "weight": 6.2106,
+        "return": 17.3
+      },
+      {
+        "ticker": "YHNF",
+        "weight": 4.8905,
+        "return": 25.2
+      }
+    ],
+    "return12m": 23.5,
+    "series": null
+  },
+  "Consumer Discretionary": {
+    "sector": "Consumer Discretionary",
+    "label": "Consumer Discretionary",
+    "computedAt": 1781545867738,
+    "window": {
+      "months": 12
+    },
+    "weighting": "official-weighted",
+    "basketSize": 8,
+    "constituentCount": 8,
+    "constituents": [
+      {
+        "ticker": "FTAL",
+        "weight": 28.7771,
+        "return": 46
+      },
+      {
+        "ticker": "MAXO",
+        "weight": 24.6875,
+        "return": 169.3
+      },
+      {
+        "ticker": "FOX",
+        "weight": 12.7487,
+        "return": 4
+      },
+      {
+        "ticker": "ISRO",
+        "weight": 12.5688,
+        "return": 69.4
+      },
+      {
+        "ticker": "CRSM",
+        "weight": 6.9993,
+        "return": 20.5
+      },
+      {
+        "ticker": "DELG",
+        "weight": 6.7294,
+        "return": -8.2
+      },
+      {
+        "ticker": "ELCO",
+        "weight": 5.0695,
+        "return": -11.5
+      },
+      {
+        "ticker": "DLTI",
+        "weight": 2.4197,
+        "return": 42.7
+      }
+    ],
+    "return12m": 65.6,
+    "series": null
+  }
+}

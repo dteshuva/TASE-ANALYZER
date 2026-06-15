@@ -137,6 +137,36 @@ export default function StockCard({ stock }) {
         </div>
       )}
 
+      {stock.sectorComparison && (
+        stock.sectorComparison.sectorReturn != null ? (
+          <div className="perf-row sector-row">
+            <span className="perf-label">{t.stock.vsSector}</span>
+            <span className="sector-name">
+              {t.sectors[stock.sectorComparison.sectorKey] || stock.sectorComparison.sectorName}
+            </span>
+            <span className="perf-bench">
+              {stock.sectorComparison.sectorReturn >= 0 ? '+' : ''}{stock.sectorComparison.sectorReturn}%
+            </span>
+            <span
+              className={
+                'sector-delta ' +
+                (stock.sectorComparison.delta >= 3 ? 'up' : stock.sectorComparison.delta <= -3 ? 'down' : 'flat')
+              }
+            >
+              {stock.sectorComparison.delta >= 0 ? '+' : ''}{stock.sectorComparison.delta}pp
+            </span>
+          </div>
+        ) : (
+          <div className="perf-row sector-row">
+            <span className="perf-label">{t.stock.vsSector}</span>
+            <span className="sector-name">
+              {t.sectors[stock.sectorComparison.sectorKey] || stock.sectorComparison.sectorName}
+            </span>
+            <span className="perf-bench muted">{t.stock.sectorUpdating}</span>
+          </div>
+        )
+      )}
+
       <div className="metrics">
         <Metric label={t.stock.marketCap} value={stock.marketCap} />
         <Metric label={t.stock.pe} value={stock.pe} />

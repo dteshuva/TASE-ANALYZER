@@ -518,6 +518,14 @@ a { color: inherit; text-decoration: none; }
 .perf-row .up { color: var(--accent); }
 .perf-row .down { color: var(--danger); }
 
+.sector-row { margin-top: 8px; }
+.sector-name { font-weight: 600; color: var(--text-dim); }
+.sector-delta { font-weight: 700; }
+.sector-delta.up { color: var(--accent); }
+.sector-delta.down { color: var(--danger); }
+.sector-delta.flat { color: var(--muted-strong); }
+.perf-bench.muted { color: var(--muted); }
+
 /* Recent news */
 .news-section { margin-top: 20px; }
 .news-title {

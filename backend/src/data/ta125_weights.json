@@ -1,0 +1,153 @@
+{
+ "Technology": {
+  "TSEM": 34.53,
+  "NVMI": 31.23,
+  "NICE": 10.12,
+  "CAMT": 9.47,
+  "MTRX": 2.59,
+  "HLAN": 2.18,
+  "GILT": 1.98,
+  "QLTU": 1.75,
+  "FORTY": 1.71,
+  "ONE": 1.67,
+  "NYAX": 1.51,
+  "PRTC": 1.26
+ },
+ "Health Care": {
+  "TEVA": 98.96,
+  "OPK": 1.04
+ },
+ "Industrials": {
+  "ESLT": 44.8955,
+  "NXSN": 17.6682,
+  "BSEN": 6.9193,
+  "SKBN": 6.8793,
+  "SPEN": 6.3094,
+  "ELAL": 4.2196,
+  "ELTR": 3.3797,
+  "ASHG": 2.4597,
+  "ARYT": 1.7998,
+  "DANE": 1.6098,
+  "VRDS": 1.4199,
+  "DNYA": 1.2299,
+  "RPOL": 0.6799,
+  "ISHI": 0.4,
+  "UNMI": 0.13
+ },
+ "Banks": {
+  "LUMI": 25.94,
+  "POLI": 25.26,
+  "DSCT": 21.3,
+  "MZTF": 18.23,
+  "FIBI": 6.95,
+  "FIBIH": 2.32
+ },
+ "Insurance": {
+  "PHOE": 38.7361,
+  "HARL": 19.568,
+  "CLIS": 17.6782,
+  "MMHD": 10.4989,
+  "MGDL": 10.359,
+  "IDIN": 1.5099,
+  "AYAL": 1.3699,
+  "WESR": 0.28
+ },
+ "Utilities": {
+  "ENLT": 34.9135,
+  "OPCE": 15.9616,
+  "DORL": 8.0108,
+  "ENRG": 6.4406,
+  "NOFR": 5.6106,
+  "MSKE": 3.0703,
+  "ECNR": 0.8201,
+  "SBEN": 0.6901,
+  "ORA": 21.4021,
+  "KEN": 3.0803
+ },
+ "Communication Services": {
+  "BEZQ": 68.38,
+  "PTNR": 20.61,
+  "CEL": 11.01
+ },
+ "Real Estate": {
+  "AZRG": 17.1834,
+  "MGOR": 14.2529,
+  "BIG": 11.4323,
+  "MLSR": 9.7019,
+  "MVNE": 7.6715,
+  "ALHE": 5.2711,
+  "AMOT": 4.6809,
+  "DIMRI": 3.0206,
+  "ISCN": 2.6005,
+  "ARPT": 2.2204,
+  "AURA": 2.1504,
+  "SLARL": 2.1304,
+  "GVYM": 1.9304,
+  "BLSR": 1.4003,
+  "ELCRE": 1.1702,
+  "AFPR": 0.9502,
+  "SMT": 0.9102,
+  "ACRO": 0.7902,
+  "IES": 0.7802,
+  "AFRE": 0.7702,
+  "AZRM": 0.7702,
+  "PRSK": 0.6601,
+  "AMRM": 0.6201,
+  "ISRS": 0.5401,
+  "PTBL": 0.4101,
+  "VILR": 0.3701,
+  "RIT1": 3.4407,
+  "ARGO": 2.1704
+ },
+ "Energy": {
+  "NVPT": 25.8226,
+  "NWMD": 16.9317,
+  "PAZ": 15.6216,
+  "DLEKG": 14.5715,
+  "RATI": 5.7206,
+  "ISRA": 5.7006,
+  "ORL": 5.0705,
+  "EQTL": 2.0802,
+  "LAPD": 1.2701,
+  "TMRP": 0.6801,
+  "ENOG": 6.5307
+ },
+ "Financials": {
+  "TASE": 35.95,
+  "MTAV": 15.53,
+  "GNRS": 11.76,
+  "ILCO": 9.29,
+  "MISH": 5.49,
+  "ISCD": 5.28,
+  "KSTN": 4.89,
+  "MRIN": 4.62,
+  "IBI": 4.49,
+  "LAHAV": 1.5,
+  "AMPA": 1.2
+ },
+ "Materials": {
+  "ICL": 56.7343,
+  "TRPZ": 21.1479,
+  "INRM": 10.189,
+  "RMON": 5.8294,
+  "SCOP": 4.4595,
+  "ACKR": 1.6399
+ },
+ "Consumer Staples": {
+  "SAE": 42.3442,
+  "STRS": 34.6835,
+  "RMLI": 11.8712,
+  "NTML": 6.2106,
+  "YHNF": 4.8905
+ },
+ "Consumer Discretionary": {
+  "FTAL": 28.7771,
+  "MAXO": 24.6875,
+  "FOX": 12.7487,
+  "ISRO": 12.5688,
+  "CRSM": 6.9993,
+  "DELG": 6.7294,
+  "ELCO": 5.0695,
+  "DLTI": 2.4197
+ }
+}

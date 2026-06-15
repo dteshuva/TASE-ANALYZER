@@ -1,0 +1,627 @@
+[
+  {
+    "ticker": "CYBR",
+    "name": "PALO ALTO NETWORKS",
+    "marketCapB": 643.03
+  },
+  {
+    "ticker": "ESLT",
+    "name": "ELBIT SYSTEMS LTD",
+    "marketCapB": 122.29
+  },
+  {
+    "ticker": "TEVA",
+    "name": "TEVA PHARMA IND",
+    "marketCapB": 118.54
+  },
+  {
+    "ticker": "LUMI",
+    "name": "BK LEUMI LE ISRAEL",
+    "marketCapB": 98.74
+  },
+  {
+    "ticker": "POLI",
+    "name": "BANK HAPOALIM B.M.",
+    "marketCapB": 90.71
+  },
+  {
+    "ticker": "TSEM",
+    "name": "TOWER SEMICONDUCTO",
+    "marketCapB": 83.23
+  },
+  {
+    "ticker": "AZRG",
+    "name": "AZRIELI GROUP",
+    "marketCapB": 52.97
+  },
+  {
+    "ticker": "MZTF",
+    "name": "MIZRAHI TEFAHOT BK",
+    "marketCapB": 52.3
+  },
+  {
+    "ticker": "NVMI",
+    "name": "NOVA LTD",
+    "marketCapB": 50.91
+  },
+  {
+    "ticker": "PHOE",
+    "name": "PHOENIX FINANC LTD",
+    "marketCapB": 43.34
+  },
+  {
+    "ticker": "ENLT",
+    "name": "ENLIGHT RENEWABLE",
+    "marketCapB": 37.81
+  },
+  {
+    "ticker": "DSCT",
+    "name": "ISRAEL DISCOUNT BK",
+    "marketCapB": 36
+  },
+  {
+    "ticker": "HARL",
+    "name": "HAREL INS INVS",
+    "marketCapB": 34.04
+  },
+  {
+    "ticker": "OPCE",
+    "name": "OPC ENERGY LTD",
+    "marketCapB": 31.82
+  },
+  {
+    "ticker": "MMHD",
+    "name": "MENORA MIVTACHIM",
+    "marketCapB": 30.43
+  },
+  {
+    "ticker": "NXSN",
+    "name": "NEXT VISION STABIL",
+    "marketCapB": 26.45
+  },
+  {
+    "ticker": "ORA",
+    "name": "ORMAT TECHNOLOGIES",
+    "marketCapB": 25.07
+  },
+  {
+    "ticker": "MGOR",
+    "name": "MEGA OR HOLDINGS L",
+    "marketCapB": 23.8
+  },
+  {
+    "ticker": "CAMT",
+    "name": "CAMTEK",
+    "marketCapB": 23.52
+  },
+  {
+    "ticker": "FIBI",
+    "name": "FIRST INTER BK ISR",
+    "marketCapB": 22.75
+  },
+  {
+    "ticker": "BEZQ",
+    "name": "BEZEQ ISRAEL TELCM",
+    "marketCapB": 21.41
+  },
+  {
+    "ticker": "ICL",
+    "name": "ICL GROUP LTD",
+    "marketCapB": 21.37
+  },
+  {
+    "ticker": "CLIS",
+    "name": "CLAL INSURANCE ENT",
+    "marketCapB": 20.61
+  },
+  {
+    "ticker": "MLSR",
+    "name": "MELISRON",
+    "marketCapB": 19.94
+  },
+  {
+    "ticker": "NWMD",
+    "name": "NEWMED ENERGY LTD",
+    "marketCapB": 19.9
+  },
+  {
+    "ticker": "MGDL",
+    "name": "MIGDAL INS & FINAN",
+    "marketCapB": 19.12
+  },
+  {
+    "ticker": "BIG",
+    "name": "BIG SHOPPING CENTE",
+    "marketCapB": 18.1
+  },
+  {
+    "ticker": "DORL",
+    "name": "DORAL GP RENEWABLE",
+    "marketCapB": 16.33
+  },
+  {
+    "ticker": "SPEN",
+    "name": "SHAPIR ENGINEERING",
+    "marketCapB": 15.91
+  },
+  {
+    "ticker": "DLEKG",
+    "name": "DELEK GROUP",
+    "marketCapB": 15.57
+  },
+  {
+    "ticker": "NVPT",
+    "name": "NAVITAS PETROLEUM",
+    "marketCapB": 15.17
+  },
+  {
+    "ticker": "NICE",
+    "name": "NICE LTD",
+    "marketCapB": 15.04
+  },
+  {
+    "ticker": "STRS",
+    "name": "STRAUSS GROUP LTD",
+    "marketCapB": 14.28
+  },
+  {
+    "ticker": "ENRG",
+    "name": "ENERGIXS-RENEWABLE",
+    "marketCapB": 14.15
+  },
+  {
+    "ticker": "TASE",
+    "name": "TEL AVIV STOCK EXC",
+    "marketCapB": 13.64
+  },
+  {
+    "ticker": "FTAL",
+    "name": "FATTAL HOLDINGS",
+    "marketCapB": 13.07
+  },
+  {
+    "ticker": "SAE",
+    "name": "SHUFERSAL LTD",
+    "marketCapB": 12.08
+  },
+  {
+    "ticker": "SKBN",
+    "name": "SHIKUN & BINUI LTD",
+    "marketCapB": 11.87
+  },
+  {
+    "ticker": "MTAV",
+    "name": "MEITAV INV HOUSE",
+    "marketCapB": 11.86
+  },
+  {
+    "ticker": "KEN",
+    "name": "KENON HLDGS LTD",
+    "marketCapB": 10.96
+  },
+  {
+    "ticker": "FIBIH",
+    "name": "F.I.B.I. HLDGS",
+    "marketCapB": 10.32
+  },
+  {
+    "ticker": "MSKE",
+    "name": "MESHEK ENGY RENEWA",
+    "marketCapB": 10.05
+  },
+  {
+    "ticker": "MVNE",
+    "name": "MIVNE REAL ESTATE",
+    "marketCapB": 9.89
+  },
+  {
+    "ticker": "AMOT",
+    "name": "AMOT INVESTMENTS",
+    "marketCapB": 9.36
+  },
+  {
+    "ticker": "BSEN",
+    "name": "BET SHEMESH ENGINE",
+    "marketCapB": 8.89
+  },
+  {
+    "ticker": "PAZ",
+    "name": "PAZ RETAIL AND EN",
+    "marketCapB": 8.58
+  },
+  {
+    "ticker": "ELTR",
+    "name": "ELECTRA LTD",
+    "marketCapB": 8.53
+  },
+  {
+    "ticker": "NOFR",
+    "name": "O.Y. NOFAR ENERGY",
+    "marketCapB": 8.48
+  },
+  {
+    "ticker": "DIMRI",
+    "name": "DIMRI BUILDING",
+    "marketCapB": 8.16
+  },
+  {
+    "ticker": "GVYM",
+    "name": "GAV-YAM LANDS CORP",
+    "marketCapB": 8.12
+  },
+  {
+    "ticker": "AFPR",
+    "name": "AFI PROPERTIES",
+    "marketCapB": 8.01
+  },
+  {
+    "ticker": "TRPZ",
+    "name": "TURPAZ INDUSTRIES",
+    "marketCapB": 7.99
+  },
+  {
+    "ticker": "ISRO",
+    "name": "ISROTEL LTD",
+    "marketCapB": 7.95
+  },
+  {
+    "ticker": "PTNR",
+    "name": "PARTNER COMMUNICAT",
+    "marketCapB": 7.75
+  },
+  {
+    "ticker": "MTRX",
+    "name": "MATRIX IT LTD",
+    "marketCapB": 7.63
+  },
+  {
+    "ticker": "ELAL",
+    "name": "EL AL ISRAEL AIRLI",
+    "marketCapB": 7.55
+  },
+  {
+    "ticker": "ALHE",
+    "name": "ALONY HETZ",
+    "marketCapB": 7.54
+  },
+  {
+    "ticker": "ASHG",
+    "name": "ASHTROM GROUP LTD",
+    "marketCapB": 7.41
+  },
+  {
+    "ticker": "IBI",
+    "name": "IBI INV HOUSE",
+    "marketCapB": 7.31
+  },
+  {
+    "ticker": "VRDS",
+    "name": "VERIDIS ENVIRONMEN",
+    "marketCapB": 7.28
+  },
+  {
+    "ticker": "NYAX",
+    "name": "NAYAX LTD",
+    "marketCapB": 7.18
+  },
+  {
+    "ticker": "ISCN",
+    "name": "ISRAEL CANADA T.R",
+    "marketCapB": 6.51
+  },
+  {
+    "ticker": "ILCO",
+    "name": "THE ISRAEL CORP",
+    "marketCapB": 6.46
+  },
+  {
+    "ticker": "ALRPR",
+    "name": "ALROV PROPERTIES",
+    "marketCapB": 6.46
+  },
+  {
+    "ticker": "CEL",
+    "name": "CELLCOM ISRAEL LTD",
+    "marketCapB": 6.12
+  },
+  {
+    "ticker": "GNRS",
+    "name": "GENERATION CAPITAL",
+    "marketCapB": 5.8
+  },
+  {
+    "ticker": "ARPT",
+    "name": "AIRPORT CITY",
+    "marketCapB": 5.77
+  },
+  {
+    "ticker": "MAXO",
+    "name": "MAX STOCK LTD.",
+    "marketCapB": 5.65
+  },
+  {
+    "ticker": "ENOG",
+    "name": "ENERGEAN PLC",
+    "marketCapB": 5.49
+  },
+  {
+    "ticker": "YHNF",
+    "name": "M YOCHANANOF & SON",
+    "marketCapB": 5.44
+  },
+  {
+    "ticker": "FORTY",
+    "name": "FORMULA SYST(1985)",
+    "marketCapB": 5.32
+  },
+  {
+    "ticker": "RMLI",
+    "name": "RAMI LEVI CHAIN",
+    "marketCapB": 5.31
+  },
+  {
+    "ticker": "AURA",
+    "name": "AURA INVESTMENTS",
+    "marketCapB": 5.12
+  },
+  {
+    "ticker": "ISRA",
+    "name": "ISRAMCO NEGEV 2",
+    "marketCapB": 5.1
+  },
+  {
+    "ticker": "RATI",
+    "name": "RATIO ENERGIES LTD",
+    "marketCapB": 5.04
+  },
+  {
+    "ticker": "ORL",
+    "name": "OIL REFINERIES LTD",
+    "marketCapB": 5.02
+  },
+  {
+    "ticker": "ONE",
+    "name": "ONE SOFTWARE TECHN",
+    "marketCapB": 4.98
+  },
+  {
+    "ticker": "HLAN",
+    "name": "HILAN LTD",
+    "marketCapB": 4.95
+  },
+  {
+    "ticker": "RMON",
+    "name": "RIMON CONSULTING &",
+    "marketCapB": 4.71
+  },
+  {
+    "ticker": "ECNR",
+    "name": "ECONERGY",
+    "marketCapB": 4.71
+  },
+  {
+    "ticker": "LAPD",
+    "name": "LAPIDOTH CAP",
+    "marketCapB": 4.53
+  },
+  {
+    "ticker": "AYAL",
+    "name": "AYALON INSURANCE",
+    "marketCapB": 4.52
+  },
+  {
+    "ticker": "RIT1",
+    "name": "REIT 1 LTD",
+    "marketCapB": 4.41
+  },
+  {
+    "ticker": "BLSR",
+    "name": "BLUE SQUARE REAL",
+    "marketCapB": 4.41
+  },
+  {
+    "ticker": "DNYA",
+    "name": "DNYA CEBUS",
+    "marketCapB": 4.39
+  },
+  {
+    "ticker": "SANO1",
+    "name": "SANO-BRUNO'S ENTER",
+    "marketCapB": 4.37
+  },
+  {
+    "ticker": "MISH",
+    "name": "MIVTACH SHAMIR HDS",
+    "marketCapB": 4.31
+  },
+  {
+    "ticker": "FOX",
+    "name": "FOX-WIZEL LTD",
+    "marketCapB": 4.3
+  },
+  {
+    "ticker": "DELG",
+    "name": "DELTA-GALIL IND",
+    "marketCapB": 4.27
+  },
+  {
+    "ticker": "KSTN",
+    "name": "KEYSTONE INFRA LTD",
+    "marketCapB": 4.17
+  },
+  {
+    "ticker": "IES",
+    "name": "IES HOLDINGS LTD",
+    "marketCapB": 4.12
+  },
+  {
+    "ticker": "INRM",
+    "name": "INROM CONSTRUCTION",
+    "marketCapB": 4.05
+  },
+  {
+    "ticker": "ISRS",
+    "name": "ISRAS INVESTMNT CO",
+    "marketCapB": 4.02
+  },
+  {
+    "ticker": "ISCD",
+    "name": "ISRACARD LTD",
+    "marketCapB": 3.99
+  },
+  {
+    "ticker": "EQTL",
+    "name": "EQUITAL",
+    "marketCapB": 3.94
+  },
+  {
+    "ticker": "SBEN",
+    "name": "SHIKUN & BINUI ENE",
+    "marketCapB": 3.87
+  },
+  {
+    "ticker": "ELCO",
+    "name": "ELCO LTD",
+    "marketCapB": 3.84
+  },
+  {
+    "ticker": "SCOP",
+    "name": "SCOPE METALS GROUP",
+    "marketCapB": 3.65
+  },
+  {
+    "ticker": "AZRM",
+    "name": "AZORIM INV DEV",
+    "marketCapB": 3.5
+  },
+  {
+    "ticker": "PRTC",
+    "name": "PRIORTECH",
+    "marketCapB": 3.47
+  },
+  {
+    "ticker": "UMH",
+    "name": "UMH PROP INC",
+    "marketCapB": 3.46
+  },
+  {
+    "ticker": "ISHI",
+    "name": "ISRAEL SHIPYARDS",
+    "marketCapB": 3.41
+  },
+  {
+    "ticker": "DANH",
+    "name": "DAN HOTELS LTD",
+    "marketCapB": 3.35
+  },
+  {
+    "ticker": "MRIN",
+    "name": "Y.D. MORE INVST",
+    "marketCapB": 3.33
+  },
+  {
+    "ticker": "CRSM",
+    "name": "CARASSO MOTORS LTD",
+    "marketCapB": 3.31
+  },
+  {
+    "ticker": "VILR",
+    "name": "VILLAR INTL LTD",
+    "marketCapB": 3.3
+  },
+  {
+    "ticker": "TLSY",
+    "name": "TELSYS LTD",
+    "marketCapB": 3.3
+  },
+  {
+    "ticker": "GILT",
+    "name": "GILAT SATELLITE NE",
+    "marketCapB": 3.25
+  },
+  {
+    "ticker": "SMT",
+    "name": "SUMMIT R/EST HLDGS",
+    "marketCapB": 3.23
+  },
+  {
+    "ticker": "OPK",
+    "name": "OPKO HEALTH INC",
+    "marketCapB": 3.22
+  },
+  {
+    "ticker": "IDIN",
+    "name": "I.D.I. INSURANCE",
+    "marketCapB": 3.22
+  },
+  {
+    "ticker": "ARYT",
+    "name": "ARYT INDUSTRIES",
+    "marketCapB": 3.17
+  },
+  {
+    "ticker": "AMRM",
+    "name": "AMRAM AVRAHAM CONS",
+    "marketCapB": 3.14
+  },
+  {
+    "ticker": "PRSK",
+    "name": "PRASHKOVSKY INVS",
+    "marketCapB": 3.14
+  },
+  {
+    "ticker": "ELCRE",
+    "name": "ELECTRA REAL ESTAT",
+    "marketCapB": 3.13
+  },
+  {
+    "ticker": "DLTI",
+    "name": "DELTA ISRAEL BRAND",
+    "marketCapB": 3.12
+  },
+  {
+    "ticker": "ARGO",
+    "name": "ARGO PROPERTIES NV",
+    "marketCapB": 3.11
+  },
+  {
+    "ticker": "DRAL",
+    "name": "DOR ALON ENERGY IN",
+    "marketCapB": 3.03
+  },
+  {
+    "ticker": "NTML",
+    "name": "NETO MALINDA",
+    "marketCapB": 3.02
+  },
+  {
+    "ticker": "LAHAV",
+    "name": "LAHAV L.R. REAL ES",
+    "marketCapB": 2.98
+  },
+  {
+    "ticker": "ACRO",
+    "name": "KVUTZAT ACRO LTD",
+    "marketCapB": 2.93
+  },
+  {
+    "ticker": "RPOL",
+    "name": "RP OPTICAL LAB LTD",
+    "marketCapB": 2.92
+  },
+  {
+    "ticker": "AFHL",
+    "name": "AFCON HOLDINGS LTD",
+    "marketCapB": 2.8
+  },
+  {
+    "ticker": "DANE",
+    "name": "DANEL-ADIR YEHOSHU",
+    "marketCapB": 2.8
+  },
+  {
+    "ticker": "LUZN",
+    "name": "AMOS LUZON DEVELOP",
+    "marketCapB": 2.79
+  }
+]
