@@ -5,9 +5,11 @@ import StockCard from '../components/StockCard.jsx';
 import AnalysisPanel from '../components/AnalysisPanel.jsx';
 import { fetchQuote, streamAnalysis } from '../services/api.js';
 import { useI18n } from '../i18n/I18nContext.jsx';
+import { useSettings } from '../settings/SettingsContext.jsx';
 
 export default function AnalyzePage() {
   const { t } = useI18n();
+  const { aiEnabled } = useSettings();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
 
@@ -49,6 +51,13 @@ export default function AnalyzePage() {
 
       setStock(quote);
       setLoadingQuote(false);
+
+      // AI analysis disabled in settings — show live data only, make no Claude request.
+      if (!aiEnabled) {
+        setLoadingAnalysis(false);
+        return;
+      }
+
       setLoadingAnalysis(true);
 
       streamRef.current = streamAnalysis(query, {
@@ -66,7 +75,7 @@ export default function AnalyzePage() {
         },
       });
     },
-    [setSearchParams, t]
+    [setSearchParams, t, aiEnabled]
   );
 
   useEffect(() => {
@@ -123,17 +132,19 @@ export default function AnalyzePage() {
       )}
 
       {stock && (
-        <div className="analysis-grid">
+        <div className={'analysis-grid' + (aiEnabled ? '' : ' single')}>
           <div className="col">
             <StockCard stock={stock} />
           </div>
-          <div className="col">
-            <AnalysisPanel
-              stock={stock}
-              loading={loadingAnalysis}
-              error={analysisError}
-            />
-          </div>
+          {aiEnabled && (
+            <div className="col">
+              <AnalysisPanel
+                stock={stock}
+                loading={loadingAnalysis}
+                error={analysisError}
+              />
+            </div>
+          )}
         </div>
       )}
     </div>

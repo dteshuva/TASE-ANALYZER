@@ -26,9 +26,19 @@ export default function Header() {
         </NavLink>
       </nav>
 
-      <div className="lang-toggle">
-        <button className={'lang-btn' + (lang === 'en' ? ' active' : '')} onClick={() => setLang('en')}>EN</button>
-        <button className={'lang-btn' + (lang === 'he' ? ' active' : '')} onClick={() => setLang('he')}>עב</button>
+      <div className="header-actions">
+        <div className="lang-toggle">
+          <button className={'lang-btn' + (lang === 'en' ? ' active' : '')} onClick={() => setLang('en')}>EN</button>
+          <button className={'lang-btn' + (lang === 'he' ? ' active' : '')} onClick={() => setLang('he')}>עב</button>
+        </div>
+        <NavLink
+          to="/settings"
+          className={({ isActive }) => 'icon-btn' + (isActive ? ' active' : '')}
+          aria-label={t.nav.settings}
+          title={t.nav.settings}
+        >
+          ⚙
+        </NavLink>
       </div>
     </header>
   );

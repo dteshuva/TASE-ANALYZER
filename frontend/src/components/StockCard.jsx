@@ -21,6 +21,12 @@ export default function StockCard({ stock }) {
   const chartData = stock.chartData || [];
   const minPrice = chartData.length ? Math.min(...chartData.map((d) => d.price)) * 0.96 : 0;
   const maxPrice = chartData.length ? Math.max(...chartData.map((d) => d.price)) * 1.04 : 100;
+  // Prefer the full "Jun 2025" label (tooltip + unique category); fall back to the
+  // short month so a backend that hasn't sent `label` yet can't blank the axis.
+  const labelOf = (d) => d.label || d.month;
+  // The last point is the current (partial) month. Keep it plotted and hoverable,
+  // but hide its X-axis tick so the axis doesn't repeat a month name at both ends.
+  const currentLabel = chartData.length ? labelOf(chartData[chartData.length - 1]) : null;
 
   // Color chart based on overall trend across the visible range
   const trendUp =
@@ -76,8 +82,11 @@ export default function StockCard({ stock }) {
               strokeDasharray="3 3"
             />
             <XAxis
-              dataKey="month"
+              dataKey={labelOf}
               tick={{ fill: '#65798c', fontSize: 10, fontFamily: 'IBM Plex Mono' }}
+              tickFormatter={(value) =>
+                value === currentLabel ? '' : String(value).split(' ')[0]
+              }
               axisLine={false}
               tickLine={false}
               dy={4}

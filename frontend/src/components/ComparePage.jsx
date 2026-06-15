@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useI18n } from '../i18n/I18nContext.jsx';
+import { useSettings } from '../settings/SettingsContext.jsx';
 import { fetchQuote, streamAnalysis, searchStocks } from '../services/api.js';
 
 // Compact autocomplete search box used for each side of the comparison.
@@ -147,6 +148,7 @@ function AiColumn({ stock, t, lang }) {
 
 export default function ComparePage() {
   const { t, lang } = useI18n();
+  const { aiEnabled } = useSettings();
   const [stocks, setStocks] = useState({ A: null, B: null });
   const [loading, setLoading] = useState({ A: false, B: false });
   const [errors, setErrors] = useState({ A: '', B: '' });
@@ -172,6 +174,12 @@ export default function ComparePage() {
       }
       patch(setStocks, side, quote);
 
+      // AI analysis disabled in settings — keep the quote-only comparison, make no Claude request.
+      if (!aiEnabled) {
+        patch(setLoading, side, false);
+        return;
+      }
+
       streamRefs.current[side] = streamAnalysis(query, {
         onComplete: (full) => {
           patch(setLoading, side, false);
@@ -182,7 +190,7 @@ export default function ComparePage() {
         },
       });
     },
-    [t]
+    [t, aiEnabled]
   );
 
   useEffect(() => () => {

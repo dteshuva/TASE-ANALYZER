@@ -142,16 +142,19 @@ async function doFetchStock(formattedTicker) {
 }
 
 async function doFetchHistory(formattedTicker) {
-  const period2 = new Date();
-  const period1 = new Date();
-  period1.setFullYear(period1.getFullYear() - 1);
+  const now = new Date();
+  // Anchor period1 to the 1st of the month 12 months ago so Yahoo returns
+  // clean calendar-month buckets. An arbitrary mid-month period1 makes Yahoo
+  // drop the earliest month and shift the rest, which (combined with the
+  // timezone quirk below) mislabels every point by a month.
+  const period1 = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 12, 1));
 
   let result;
   try {
     result = await withRetry(() =>
       yf.chart(formattedTicker, {
         period1: period1.toISOString().slice(0, 10),
-        period2: period2.toISOString().slice(0, 10),
+        period2: now.toISOString().slice(0, 10),
         interval: '1mo',
       })
     );
@@ -162,13 +165,23 @@ async function doFetchHistory(formattedTicker) {
     throw e;
   }
 
-  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  // Yahoo timestamps each monthly bar at midnight start-of-month in the
+  // exchange timezone (Asia/Jerusalem), which in UTC is the last day of the
+  // PREVIOUS month. Deriving the label from the UTC/server-local date would
+  // shift every point a month early, so format it in the exchange timezone.
+  const tz = result.meta?.exchangeTimezoneName || 'Asia/Jerusalem';
+  const monthFmt = new Intl.DateTimeFormat('en-US', { timeZone: tz, month: 'short' });
+  const labelFmt = new Intl.DateTimeFormat('en-US', { timeZone: tz, month: 'short', year: 'numeric' });
   return (result.quotes || [])
     .filter((q) => q.close != null)
-    .map((q) => ({
-      month: MONTHS[new Date(q.date).getMonth()],
-      price: Math.round(q.close),
-    }));
+    .map((q) => {
+      const d = new Date(q.date);
+      return {
+        month: monthFmt.format(d), // short label, e.g. "Jun" — X-axis tick
+        label: labelFmt.format(d), // full label, e.g. "Jun 2025" — tooltip
+        price: Math.round(q.close),
+      };
+    });
 }
 
 // The TA-125 is the headline TASE benchmark index. Its trailing 52-week return

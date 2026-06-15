@@ -7,6 +7,7 @@ export const translations = {
       compare: 'Compare',
       watchlist: 'Watchlist',
       about: 'About',
+      settings: 'Settings',
     },
     compare: {
       title: 'Compare stocks',
@@ -112,6 +113,18 @@ export const translations = {
       disclaimerTitle: 'Important disclaimer',
       disclaimer: 'This tool is for educational and informational purposes only. The analysis and predictions are AI-generated and may contain inaccuracies. This is NOT financial advice. Always consult a licensed financial advisor before making investment decisions. The Israel Securities Authority (ISA) regulates investment advisory services in Israel.',
     },
+    settings: {
+      title: 'Settings',
+      subtitle: 'Personalize how TASE Analyzer looks and works. Preferences are saved in your browser.',
+      aiLabel: 'AI analysis',
+      aiDesc: 'Use Claude to generate the AI outlook, verdict, price targets, risks and catalysts. Turn this off to browse live prices, charts and metrics only — no AI requests are made, saving API tokens.',
+      aiOn: 'On',
+      aiOff: 'Off',
+      themeLabel: 'Light theme',
+      themeDesc: 'Switch between the default dark interface and a bright, light one.',
+      themeOn: 'Light',
+      themeOff: 'Dark',
+    },
     footer: {
       disclaimer: 'Not financial advice. For educational purposes only.',
     },
@@ -124,6 +137,7 @@ export const translations = {
       compare: 'השוואה',
       watchlist: 'רשימת מעקב',
       about: 'אודות',
+      settings: 'הגדרות',
     },
     compare: {
       title: 'השוואת מניות',
@@ -228,6 +242,18 @@ export const translations = {
       p2: 'עבור כל מניה, ה-AI מייצר תחזית עסקית, מזהה סיכונים וזרזים, ומפיק תחזית מחיר ל-12 חודשים עם יעדים שמרניים ואופטימיים.',
       disclaimerTitle: 'הבהרה חשובה',
       disclaimer: 'הכלי הזה נועד למטרות חינוכיות ואינפורמטיביות בלבד. הניתוחים והתחזיות מופקים על ידי AI ועלולים להכיל שגיאות. זה אינו ייעוץ השקעות. תמיד התייעץ עם יועץ פיננסי מורשה לפני קבלת החלטות השקעה. רשות ניירות ערך מסדירה את שירותי הייעוץ להשקעה בישראל.',
+    },
+    settings: {
+      title: 'הגדרות',
+      subtitle: 'התאם אישית את המראה והפעולה של הכלי. ההעדפות נשמרות בדפדפן שלך.',
+      aiLabel: 'ניתוח AI',
+      aiDesc: 'השתמש ב-Claude כדי להפיק את התחזית, ההמלצה, יעדי המחיר, הסיכונים והזרזים. כבה כדי לעיין במחירים, בגרפים ובנתונים בלבד — ללא בקשות AI, וכך לחסוך בטוקנים.',
+      aiOn: 'פעיל',
+      aiOff: 'כבוי',
+      themeLabel: 'ערכת נושא בהירה',
+      themeDesc: 'מעבר בין הממשק הכהה (ברירת מחדל) לממשק בהיר.',
+      themeOn: 'בהיר',
+      themeOff: 'כהה',
     },
     footer: {
       disclaimer: 'אינו ייעוץ השקעות. למטרות חינוכיות בלבד.',
