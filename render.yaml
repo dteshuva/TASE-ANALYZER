@@ -1,0 +1,28 @@
+# Render Blueprint for the backend API.
+# In Render: New + → "Blueprint" → pick the dteshuva/TASE-ANALYZER repo.
+# Secrets (sync: false) are entered in the Render dashboard, never committed.
+services:
+  - type: web
+    name: tase-analyzer-backend
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: CLAUDE_MODEL
+        value: claude-sonnet-4-5
+      # Set these in the dashboard (kept out of git):
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: APP_PASSWORD
+        sync: false
+      # Comma-separated; set to your Vercel frontend URL after step 2,
+      # e.g. https://tase-analyzer.vercel.app
+      - key: ALLOWED_ORIGINS
+        sync: false
