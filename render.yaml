@@ -1,6 +1,11 @@
 # Render Blueprint for the backend API.
 # In Render: New + → "Blueprint" → pick the dteshuva/TASE-ANALYZER repo.
 # Secrets (sync: false) are entered in the Render dashboard, never committed.
+#
+# Free plan spins the service down after ~15min idle; the first request after
+# that pays a ~50s cold-start, which the frontend's fetch times out on and
+# shows as a generic failure. A free external monitor (e.g. cron-job.org or
+# UptimeRobot) pinging healthCheckPath every ~10min keeps it warm.
 services:
   - type: web
     name: tase-analyzer-backend

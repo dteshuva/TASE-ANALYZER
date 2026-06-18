@@ -47,7 +47,7 @@
   "Technology": {
     "sector": "Technology",
     "label": "Technology",
-    "computedAt": 1781545862508,
+    "computedAt": 1781753078323,
     "window": {
       "months": 12
     },
@@ -58,60 +58,60 @@
       {
         "ticker": "NVMI",
         "weight": 31.23,
-        "return": 120.3
+        "return": 106.5
       },
       {
         "ticker": "NICE",
         "weight": 10.12,
-        "return": -56.5
+        "return": -57.8
       },
       {
         "ticker": "CAMT",
         "weight": 9.47,
-        "return": 119.7
+        "return": 102.7
       },
       {
         "ticker": "MTRX",
         "weight": 2.59,
-        "return": -21
+        "return": -25.6
       },
       {
         "ticker": "HLAN",
         "weight": 2.18,
-        "return": -19.3
+        "return": -23.2
       },
       {
         "ticker": "GILT",
         "weight": 1.98,
-        "return": 87.1
+        "return": 80.7
       },
       {
         "ticker": "QLTU",
         "weight": 1.75,
-        "return": 71.1
+        "return": 53.5
       },
       {
         "ticker": "FORTY",
         "weight": 1.71,
-        "return": -10.4
+        "return": -16.5
       },
       {
         "ticker": "ONE",
         "weight": 1.67,
-        "return": -16.6
+        "return": -19.7
       },
       {
         "ticker": "NYAX",
         "weight": 1.51,
-        "return": 24.6
+        "return": 18.1
       },
       {
         "ticker": "PRTC",
         "weight": 1.26,
-        "return": 96.4
+        "return": 81
       }
     ],
-    "return12m": 70.8,
+    "return12m": 59.9,
     "series": null
   },
   "Health Care": {
@@ -617,7 +617,7 @@
   "Materials": {
     "sector": "Materials",
     "label": "Materials",
-    "computedAt": 1781545867225,
+    "computedAt": 1781753075661,
     "window": {
       "months": 12
     },
@@ -628,35 +628,35 @@
       {
         "ticker": "ICL",
         "weight": 56.7343,
-        "return": -28.9
+        "return": -33.7
       },
       {
         "ticker": "TRPZ",
         "weight": 21.1479,
-        "return": 98
+        "return": 89.3
       },
       {
         "ticker": "INRM",
         "weight": 10.189,
-        "return": 51
+        "return": 31.1
       },
       {
         "ticker": "RMON",
         "weight": 5.8294,
-        "return": 166.2
+        "return": 159.8
       },
       {
         "ticker": "SCOP",
         "weight": 4.4595,
-        "return": 94.3
+        "return": 90.6
       },
       {
         "ticker": "ACKR",
         "weight": 1.6399,
-        "return": 5.1
+        "return": -3.4
       }
     ],
-    "return12m": 23.5,
+    "return12m": 16.2,
     "series": null
   },
   "Consumer Staples": {
