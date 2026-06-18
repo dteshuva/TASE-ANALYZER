@@ -43,12 +43,14 @@ Frontend runs on `http://localhost:5173`. Open it in your browser.
 
 ## Production deployment
 
-- **Backend**: deploy to Railway, Render, Fly.io, or any Node host. Set these env vars:
+- **Backend**: `render.yaml` is a Render Blueprint — in Render, New + → "Blueprint" → pick this repo. Set these env vars in the dashboard (kept out of git):
   - `ANTHROPIC_API_KEY` — your Claude API key.
-  - `ALLOWED_ORIGINS` — comma-separated list of your frontend's public origin(s).
+  - `ALLOWED_ORIGINS` — comma-separated list of your frontend's public origin(s), e.g. your Vercel URL.
   - `APP_PASSWORD` — the shared password users must enter to access the app. **Required for access control** — if left unset, the API is open. Each user enters it once per device.
   - `NODE_ENV=production` — hides internal error details from API responses.
-- **Frontend**: `npm run build` produces `dist/`. Deploy to Vercel, Netlify, or Cloudflare Pages. Set `VITE_API_URL` to your backend's public URL.
+
+  On Render's free plan the service spins down after ~15min idle, causing a ~50s cold-start on the next request (the frontend's fetch will time out). A free external monitor (e.g. cron-job.org or UptimeRobot) pinging `/health` every ~10min keeps it warm.
+- **Frontend**: `vercel.json` has the SPA rewrite needed for client-side routing. Deploy to Vercel (or any static host that supports SPA rewrites). Set `VITE_API_URL` to your backend's public URL.
 
 ### Access control
 
@@ -61,11 +63,11 @@ The app is gated by a single shared password (`APP_PASSWORD`). On first visit us
 - Bullish probability score (0–100%)
 - BUY / HOLD / SELL verdict
 - 12-month bear and bull price targets
-- Simulated 12-month price history chart
+- Real 12-month price history chart (Yahoo Finance)
+- Stock-vs-sector performance comparison
+- Related news articles per stock
 - Watchlist (saved to browser localStorage)
 - Full bilingual UI with RTL layout for Hebrew
 
-## What to add for production
 
- **Caching layer** — Add Redis to cache analysis results per ticker for ~5 minutes. The backend has in-memory caching as a starting point.
 
