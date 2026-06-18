@@ -1,1 +1,4 @@
 .claude/
+
+# Windows "mark of the web" artifacts created when files are downloaded
+*:Zone.Identifier

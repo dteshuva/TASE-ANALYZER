@@ -1,8 +1,10 @@
 import { NavLink } from 'react-router-dom';
 import { useI18n } from '../i18n/I18nContext.jsx';
+import { useAuth } from '../auth/AuthContext.jsx';
 
 export default function Header() {
   const { t, lang, setLang } = useI18n();
+  const { authEnabled, logout } = useAuth();
   return (
     <header className="header">
       <div className="brand">
@@ -39,6 +41,16 @@ export default function Header() {
         >
           ⚙
         </NavLink>
+        {authEnabled && (
+          <button
+            className="icon-btn"
+            onClick={logout}
+            aria-label={t.auth.logout}
+            title={t.auth.logout}
+          >
+            ⎋
+          </button>
+        )}
       </div>
     </header>
   );

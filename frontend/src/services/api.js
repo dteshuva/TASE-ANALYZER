@@ -1,13 +1,74 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
+// ---- Auth token storage -----------------------------------------------------
+// The bearer token is kept in localStorage so a returning user is not asked for
+// the password again. It is attached to every API request below.
+const TOKEN_KEY = 'tase_auth_token';
+
+export const getToken = () => localStorage.getItem(TOKEN_KEY);
+export const setToken = (t) => {
+  if (t) localStorage.setItem(TOKEN_KEY, t);
+  else localStorage.removeItem(TOKEN_KEY);
+};
+export const clearToken = () => localStorage.removeItem(TOKEN_KEY);
+
+// Build request headers, attaching the bearer token when we have one.
+function authHeaders(extra = {}) {
+  const headers = { 'Content-Type': 'application/json', ...extra };
+  const token = getToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
+}
+
+// Called when the server rejects our token. Drops it and signals the app to
+// bounce the user back to the login screen.
+function onUnauthorized() {
+  clearToken();
+  window.dispatchEvent(new Event('auth:expired'));
+}
+
+// Whether the backend requires a login. Used at startup to decide between the
+// login screen and going straight into the app. Fails closed (assume auth
+// required) if the backend can't be reached.
+export async function fetchAuthStatus() {
+  try {
+    const res = await fetch(`${API_URL}/api/auth-status`);
+    if (!res.ok) return true;
+    const body = await res.json();
+    return !!body.authEnabled;
+  } catch {
+    return true;
+  }
+}
+
+// Exchange the shared password for a token (stored on success). Returns the
+// token (which is null when the backend has auth disabled).
+export async function login(password) {
+  const res = await fetch(`${API_URL}/api/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password }),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `Login failed: ${res.status}`);
+  }
+  const { token } = await res.json();
+  setToken(token);
+  return token;
+}
+
+// ---- Data endpoints ---------------------------------------------------------
+
 export async function fetchQuote(query) {
   const res = await fetch(`${API_URL}/api/quote`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify({ query }),
   });
 
   if (!res.ok) {
+    if (res.status === 401) onUnauthorized();
     const errBody = await res.json().catch(() => ({}));
     const err = new Error(errBody.error || `Request failed: ${res.status}`);
     err.status = res.status;
@@ -24,11 +85,12 @@ export async function fetchQuote(query) {
 export async function fetchQuotes(tickers) {
   const res = await fetch(`${API_URL}/api/quotes`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify({ tickers }),
   });
 
   if (!res.ok) {
+    if (res.status === 401) onUnauthorized();
     const errBody = await res.json().catch(() => ({}));
     const err = new Error(errBody.error || `Request failed: ${res.status}`);
     err.status = res.status;
@@ -43,10 +105,13 @@ export async function searchStocks(query) {
   try {
     const res = await fetch(`${API_URL}/api/search`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders(),
       body: JSON.stringify({ query }),
     });
-    if (!res.ok) return { results: [] };
+    if (!res.ok) {
+      if (res.status === 401) onUnauthorized();
+      return { results: [] };
+    }
     return res.json();
   } catch {
     return { results: [] };
@@ -63,7 +128,7 @@ export function streamAnalysis(query, { onProgress, onComplete, onError } = {}) 
     try {
       res = await fetch(`${API_URL}/api/analyze`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
+        headers: authHeaders({ Accept: 'text/event-stream' }),
         body: JSON.stringify({ query }),
         signal: controller.signal,
       });
@@ -73,6 +138,7 @@ export function streamAnalysis(query, { onProgress, onComplete, onError } = {}) 
     }
 
     if (!res.ok) {
+      if (res.status === 401) onUnauthorized();
       const body = await res.json().catch(() => ({}));
       onError?.({
         error: body.error || `Request failed: ${res.status}`,

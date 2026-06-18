@@ -43,8 +43,16 @@ Frontend runs on `http://localhost:5173`. Open it in your browser.
 
 ## Production deployment
 
-- **Backend**: deploy to Railway, Render, Fly.io, or any Node host. Set `ANTHROPIC_API_KEY` and `ALLOWED_ORIGINS` env vars.
+- **Backend**: deploy to Railway, Render, Fly.io, or any Node host. Set these env vars:
+  - `ANTHROPIC_API_KEY` — your Claude API key.
+  - `ALLOWED_ORIGINS` — comma-separated list of your frontend's public origin(s).
+  - `APP_PASSWORD` — the shared password users must enter to access the app. **Required for access control** — if left unset, the API is open. Each user enters it once per device.
+  - `NODE_ENV=production` — hides internal error details from API responses.
 - **Frontend**: `npm run build` produces `dist/`. Deploy to Vercel, Netlify, or Cloudflare Pages. Set `VITE_API_URL` to your backend's public URL.
+
+### Access control
+
+The app is gated by a single shared password (`APP_PASSWORD`). On first visit users are shown a login screen; on success a token is stored in the browser so they aren't asked again on that device. The password is verified server-side and every API request must carry the token, so the paid `/api/analyze` endpoint can't be called without it. Change the password at any time by updating `APP_PASSWORD` — this invalidates all existing tokens.
 
 ## What's included
 

@@ -128,6 +128,15 @@ export const translations = {
     footer: {
       disclaimer: 'Not financial advice. For educational purposes only.',
     },
+    auth: {
+      title: 'TASE Analyzer',
+      subtitle: 'Enter the access password to continue.',
+      passwordPlaceholder: 'Password',
+      submit: 'Unlock',
+      submitting: 'Checking…',
+      error: 'Incorrect password. Please try again.',
+      logout: 'Log out',
+    },
   },
   he: {
     brand: 'בורסה',
@@ -257,6 +266,15 @@ export const translations = {
     },
     footer: {
       disclaimer: 'אינו ייעוץ השקעות. למטרות חינוכיות בלבד.',
+    },
+    auth: {
+      title: 'TASE Analyzer',
+      subtitle: 'הזן את סיסמת הגישה כדי להמשיך.',
+      passwordPlaceholder: 'סיסמה',
+      submit: 'כניסה',
+      submitting: 'בודק…',
+      error: 'סיסמה שגויה. נסה שוב.',
+      logout: 'התנתק',
     },
   },
 };
