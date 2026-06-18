@@ -2,7 +2,7 @@
   "Banks": {
     "sector": "Banks",
     "label": "Banks",
-    "computedAt": 1781545863507,
+    "computedAt": 1781752715338,
     "window": {
       "months": 12
     },
@@ -13,35 +13,35 @@
       {
         "ticker": "LUMI",
         "weight": 25.94,
-        "return": 14.7
+        "return": 13
       },
       {
         "ticker": "POLI",
         "weight": 25.26,
-        "return": 15.9
+        "return": 12.8
       },
       {
         "ticker": "DSCT",
         "weight": 21.3,
-        "return": -2.8
+        "return": -5.5
       },
       {
         "ticker": "MZTF",
         "weight": 18.23,
-        "return": 2.3
+        "return": -0.5
       },
       {
         "ticker": "FIBI",
         "weight": 6.95,
-        "return": 6
+        "return": 1.9
       },
       {
         "ticker": "FIBIH",
         "weight": 2.32,
-        "return": 27.9
+        "return": 22.9
       }
     ],
-    "return12m": 8.7,
+    "return12m": 6,
     "series": null
   },
   "Technology": {
@@ -117,7 +117,7 @@
   "Health Care": {
     "sector": "Health Care",
     "label": "Health Care",
-    "computedAt": 1781545862720,
+    "computedAt": 1781752707007,
     "window": {
       "months": 12
     },
@@ -128,21 +128,21 @@
       {
         "ticker": "TEVA",
         "weight": 98.96,
-        "return": 62.6
+        "return": 60.3
       },
       {
         "ticker": "OPK",
         "weight": 1.04,
-        "return": -13.6
+        "return": -8.8
       }
     ],
-    "return12m": 61.8,
+    "return12m": 59.6,
     "series": null
   },
   "Industrials": {
     "sector": "Industrials",
     "label": "Industrials",
-    "computedAt": 1781545863277,
+    "computedAt": 1781752736736,
     "window": {
       "months": 12
     },
@@ -153,70 +153,70 @@
       {
         "ticker": "ESLT",
         "weight": 44.8955,
-        "return": 49.1
+        "return": 54.4
       },
       {
         "ticker": "BSEN",
         "weight": 6.9193,
-        "return": 74.5
+        "return": 68.5
       },
       {
         "ticker": "SKBN",
         "weight": 6.8793,
-        "return": 53.7
+        "return": 44.5
       },
       {
         "ticker": "SPEN",
         "weight": 6.3094,
-        "return": 55.2
+        "return": 54.7
       },
       {
         "ticker": "ELAL",
         "weight": 4.2196,
-        "return": 0.1
+        "return": -5.1
       },
       {
         "ticker": "ELTR",
         "weight": 3.3797,
-        "return": 19.7
+        "return": 16.9
       },
       {
         "ticker": "ASHG",
         "weight": 2.4597,
-        "return": 9.1
+        "return": 2.8
       },
       {
         "ticker": "ARYT",
         "weight": 1.7998,
-        "return": 24.2
+        "return": 29.9
       },
       {
         "ticker": "DANE",
         "weight": 1.6098,
-        "return": 8.7
+        "return": 9.2
       },
       {
         "ticker": "VRDS",
         "weight": 1.4199,
-        "return": 86.8
+        "return": 80.2
       },
       {
         "ticker": "DNYA",
         "weight": 1.2299,
-        "return": 9.9
+        "return": 5.3
       },
       {
         "ticker": "ISHI",
         "weight": 0.4,
-        "return": 5.3
+        "return": -0.1
       },
       {
         "ticker": "UNMI",
         "weight": 0.13,
-        "return": 3.3
+        "return": 4.4
       }
     ],
-    "return12m": 45.6,
+    "return12m": 46.5,
     "series": null
   },
   "Insurance": {

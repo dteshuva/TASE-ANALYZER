@@ -203,12 +203,18 @@ export async function fetchBenchmark12mReturn() {
 
 // Recent news headlines for a company, via Yahoo's search endpoint. Best-effort:
 // news is supplementary, so any failure degrades to an empty list.
-export async function fetchStockNews(query) {
+//
+// Yahoo's search ranks news by loose keyword match against the query string, so a
+// company-name query (e.g. "Delek Group", "Harel Insurance") routinely pulls back
+// unrelated articles that merely share a word. Each news item carries a
+// `relatedTickers` array though, so we only keep ones that actually name this stock.
+export async function fetchStockNews(query, ticker) {
   if (!query) return [];
+  const symbol = ticker ? toTATicker(ticker) : null;
   try {
     const result = await withRetry(() => yf.search(query, {}, { validateResult: false }));
     return (result.news || [])
-      .filter((n) => n.title && n.link)
+      .filter((n) => n.title && n.link && (!symbol || n.relatedTickers?.includes(symbol)))
       .slice(0, 4)
       .map((n) => ({
         title: n.title,

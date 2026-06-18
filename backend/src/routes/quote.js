@@ -34,7 +34,7 @@ router.post('/', async (req, res, next) => {
 
     const companyName = stockData.longName || stockData.shortName || stockData.ticker;
     // Kick off news in parallel; it never throws (degrades to []).
-    const newsPromise = fetchStockNews(companyName);
+    const newsPromise = fetchStockNews(companyName, stockData.ticker);
 
     // 12-month performance of the stock vs the TA-125 benchmark. Optional — a
     // benchmark hiccup must never fail the quote, so it degrades to null.
