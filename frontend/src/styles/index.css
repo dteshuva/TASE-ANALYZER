@@ -662,20 +662,6 @@ a { color: inherit; text-decoration: none; }
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-.cached-badge {
-  display: inline-flex;
-  align-items: center;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--muted);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  padding: 4px 9px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
 .ai-dot {
   width: 6px;
   height: 6px;

@@ -59,7 +59,6 @@ export default function AnalysisPanel({ stock, loading, error }) {
           <span className="ai-dot" />
           {t.analysis.poweredBy}
         </div>
-        {stock.cached && <div className="cached-badge">{t.analysis.cachedResult}</div>}
       </div>
 
       <div className="analysis-text">
