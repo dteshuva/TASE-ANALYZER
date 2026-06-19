@@ -2,7 +2,7 @@
   "Banks": {
     "sector": "Banks",
     "label": "Banks",
-    "computedAt": 1781752715338,
+    "computedAt": 1781845830033,
     "window": {
       "months": 12
     },
@@ -13,35 +13,35 @@
       {
         "ticker": "LUMI",
         "weight": 25.94,
-        "return": 13
+        "return": 14.1
       },
       {
         "ticker": "POLI",
         "weight": 25.26,
-        "return": 12.8
+        "return": 13.4
       },
       {
         "ticker": "DSCT",
         "weight": 21.3,
-        "return": -5.5
+        "return": -5
       },
       {
         "ticker": "MZTF",
         "weight": 18.23,
-        "return": -0.5
+        "return": -1.2
       },
       {
         "ticker": "FIBI",
         "weight": 6.95,
-        "return": 1.9
+        "return": 2.5
       },
       {
         "ticker": "FIBIH",
         "weight": 2.32,
-        "return": 22.9
+        "return": 23.3
       }
     ],
-    "return12m": 6,
+    "return12m": 6.5,
     "series": null
   },
   "Technology": {
@@ -117,7 +117,7 @@
   "Health Care": {
     "sector": "Health Care",
     "label": "Health Care",
-    "computedAt": 1781752707007,
+    "computedAt": 1781845852986,
     "window": {
       "months": 12
     },
@@ -128,21 +128,21 @@
       {
         "ticker": "TEVA",
         "weight": 98.96,
-        "return": 60.3
+        "return": 53.3
       },
       {
         "ticker": "OPK",
         "weight": 1.04,
-        "return": -8.8
+        "return": -9.3
       }
     ],
-    "return12m": 59.6,
+    "return12m": 52.6,
     "series": null
   },
   "Industrials": {
     "sector": "Industrials",
     "label": "Industrials",
-    "computedAt": 1781752736736,
+    "computedAt": 1781845851374,
     "window": {
       "months": 12
     },
@@ -153,47 +153,47 @@
       {
         "ticker": "ESLT",
         "weight": 44.8955,
-        "return": 54.4
+        "return": 53.1
       },
       {
         "ticker": "BSEN",
         "weight": 6.9193,
-        "return": 68.5
+        "return": 75.2
       },
       {
         "ticker": "SKBN",
         "weight": 6.8793,
-        "return": 44.5
+        "return": 40.2
       },
       {
         "ticker": "SPEN",
         "weight": 6.3094,
-        "return": 54.7
+        "return": 56.6
       },
       {
         "ticker": "ELAL",
         "weight": 4.2196,
-        "return": -5.1
+        "return": -0.9
       },
       {
         "ticker": "ELTR",
         "weight": 3.3797,
-        "return": 16.9
+        "return": 15.6
       },
       {
         "ticker": "ASHG",
         "weight": 2.4597,
-        "return": 2.8
+        "return": 0.6
       },
       {
         "ticker": "ARYT",
         "weight": 1.7998,
-        "return": 29.9
+        "return": 35.4
       },
       {
         "ticker": "DANE",
         "weight": 1.6098,
-        "return": 9.2
+        "return": 11
       },
       {
         "ticker": "VRDS",
@@ -203,20 +203,20 @@
       {
         "ticker": "DNYA",
         "weight": 1.2299,
-        "return": 5.3
+        "return": 5.8
       },
       {
         "ticker": "ISHI",
         "weight": 0.4,
-        "return": -0.1
+        "return": 0.5
       },
       {
         "ticker": "UNMI",
         "weight": 0.13,
-        "return": 4.4
+        "return": 5.2
       }
     ],
-    "return12m": 46.5,
+    "return12m": 46.4,
     "series": null
   },
   "Insurance": {
@@ -357,147 +357,152 @@
   "Real Estate": {
     "sector": "Real Estate",
     "label": "Real Estate",
-    "computedAt": 1781545866163,
+    "computedAt": 1781845844021,
     "window": {
       "months": 12
     },
     "weighting": "official-weighted",
     "basketSize": 28,
-    "constituentCount": 25,
+    "constituentCount": 26,
     "constituents": [
       {
         "ticker": "AZRG",
         "weight": 17.1834,
-        "return": 53.4
+        "return": 46.2
       },
       {
         "ticker": "BIG",
         "weight": 11.4323,
-        "return": 17.5
+        "return": 14.4
       },
       {
         "ticker": "MLSR",
         "weight": 9.7019,
-        "return": 22.9
+        "return": 21.6
       },
       {
         "ticker": "MVNE",
         "weight": 7.6715,
-        "return": 18.6
+        "return": 17
       },
       {
         "ticker": "ALHE",
         "weight": 5.2711,
-        "return": 15.6
+        "return": 6.4
       },
       {
         "ticker": "AMOT",
         "weight": 4.6809,
-        "return": -5.4
+        "return": -11
       },
       {
         "ticker": "RIT1",
         "weight": 3.4407,
-        "return": 4.3
+        "return": 1.2
       },
       {
         "ticker": "DIMRI",
         "weight": 3.0206,
-        "return": 3.9
+        "return": 0
       },
       {
         "ticker": "ISCN",
         "weight": 2.6005,
-        "return": 44.7
+        "return": 43.7
       },
       {
         "ticker": "ARPT",
         "weight": 2.2204,
-        "return": -4.2
+        "return": -6.9
       },
       {
         "ticker": "ARGO",
         "weight": 2.1704,
-        "return": 24.3
+        "return": 22.2
       },
       {
         "ticker": "AURA",
         "weight": 2.1504,
-        "return": -14.6
+        "return": -12
       },
       {
         "ticker": "SLARL",
         "weight": 2.1304,
-        "return": -2
+        "return": -6.3
       },
       {
         "ticker": "GVYM",
         "weight": 1.9304,
-        "return": 14.7
+        "return": 14
       },
       {
         "ticker": "BLSR",
         "weight": 1.4003,
-        "return": 9.4
+        "return": -3.9
       },
       {
         "ticker": "ELCRE",
         "weight": 1.1702,
-        "return": 5.4
+        "return": -0.5
       },
       {
         "ticker": "AFPR",
         "weight": 0.9502,
-        "return": -5.5
+        "return": -4.2
       },
       {
         "ticker": "SMT",
         "weight": 0.9102,
-        "return": -17.1
+        "return": -19.4
       },
       {
         "ticker": "ACRO",
         "weight": 0.7902,
-        "return": -7.2
+        "return": -8.7
+      },
+      {
+        "ticker": "IES",
+        "weight": 0.7802,
+        "return": 192.5
       },
       {
         "ticker": "AFRE",
         "weight": 0.7702,
-        "return": -15.2
+        "return": -21.7
       },
       {
         "ticker": "AZRM",
         "weight": 0.7702,
-        "return": -12.5
+        "return": -15.6
       },
       {
         "ticker": "PRSK",
         "weight": 0.6601,
-        "return": 40.4
+        "return": 42.3
       },
       {
         "ticker": "ISRS",
         "weight": 0.5401,
-        "return": -2.6
+        "return": -2.9
       },
       {
         "ticker": "PTBL",
         "weight": 0.4101,
-        "return": 17.3
+        "return": 13.8
       },
       {
         "ticker": "VILR",
         "weight": 0.3701,
-        "return": 1.6
+        "return": -10.1
       }
     ],
-    "return12m": 20.4,
+    "return12m": 18,
     "series": null
   },
   "Energy": {
     "sector": "Energy",
     "label": "Energy",
-    "computedAt": 1781545866579,
+    "computedAt": 1781899920127,
     "window": {
       "months": 12
     },
@@ -508,45 +513,45 @@
       {
         "ticker": "NWMD",
         "weight": 16.9317,
-        "return": 11.1
+        "return": 3
       },
       {
         "ticker": "PAZ",
         "weight": 15.6216,
-        "return": 44.8
+        "return": 39.7
       },
       {
         "ticker": "DLEKG",
         "weight": 14.5715,
-        "return": 26.2
+        "return": 12
       },
       {
         "ticker": "ENOG",
         "weight": 6.5307,
-        "return": -31.3
+        "return": -37.7
       },
       {
         "ticker": "ORL",
         "weight": 5.0705,
-        "return": 68
+        "return": 67.6
       },
       {
         "ticker": "EQTL",
         "weight": 2.0802,
-        "return": -22.3
+        "return": -23.1
       },
       {
         "ticker": "LAPD",
         "weight": 1.2701,
-        "return": 8
+        "return": 6.2
       },
       {
         "ticker": "TMRP",
         "weight": 0.6801,
-        "return": -33.7
+        "return": -37
       }
     ],
-    "return12m": 21.5,
+    "return12m": 14,
     "series": null
   },
   "Financials": {

@@ -7,6 +7,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from 'recharts';
+import { Link } from 'react-router-dom';
 import { useI18n } from '../i18n/I18nContext.jsx';
 import { useWatchlist } from '../hooks/useWatchlist.js';
 
@@ -63,6 +64,9 @@ export default function StockCard({ stock }) {
           >
             {inWatchlist ? '★ ' + t.stock.removeWatchlist : '☆ ' + t.stock.addWatchlist}
           </button>
+          <Link className="watchlist-toggle" to={`/financials/${stock.ticker}`}>
+            {t.stock.viewFinancials}
+          </Link>
         </div>
       </div>
 
@@ -78,12 +82,12 @@ export default function StockCard({ stock }) {
             </defs>
             <CartesianGrid
               vertical={false}
-              stroke="rgba(255,255,255,0.04)"
+              stroke="var(--border)"
               strokeDasharray="3 3"
             />
             <XAxis
               dataKey={labelOf}
-              tick={{ fill: '#65798c', fontSize: 10, fontFamily: 'IBM Plex Mono' }}
+              tick={{ fill: 'var(--muted)', fontSize: 10, fontFamily: 'IBM Plex Mono' }}
               tickFormatter={(value) =>
                 value === currentLabel ? '' : String(value).split(' ')[0]
               }
@@ -93,24 +97,24 @@ export default function StockCard({ stock }) {
             />
             <YAxis
               domain={[minPrice, maxPrice]}
-              tick={{ fill: '#65798c', fontSize: 10, fontFamily: 'IBM Plex Mono' }}
+              tick={{ fill: 'var(--muted)', fontSize: 10, fontFamily: 'IBM Plex Mono' }}
               axisLine={false}
               tickLine={false}
               tickFormatter={(v) => `${v.toFixed(0)}`}
               width={48}
             />
             <Tooltip
-              cursor={{ stroke: 'rgba(255,255,255,0.15)', strokeWidth: 1, strokeDasharray: '3 3' }}
+              cursor={{ stroke: 'var(--border-hover)', strokeWidth: 1, strokeDasharray: '3 3' }}
               contentStyle={{
-                background: 'rgba(13, 21, 32, 0.96)',
-                border: '1px solid rgba(255,255,255,0.12)',
+                background: 'var(--surface-2)',
+                border: '1px solid var(--border-strong)',
                 borderRadius: 8,
                 fontFamily: 'IBM Plex Mono',
                 fontSize: 11,
                 padding: '8px 10px',
                 boxShadow: '0 8px 24px -8px rgba(0,0,0,0.6)',
               }}
-              labelStyle={{ color: '#65798c', marginBottom: 4, fontSize: 10, letterSpacing: '0.06em' }}
+              labelStyle={{ color: 'var(--muted)', marginBottom: 4, fontSize: 10, letterSpacing: '0.06em' }}
               itemStyle={{ color: chartColor, fontWeight: 600 }}
               formatter={(v) => [v.toLocaleString(), 'Price']}
             />
@@ -123,7 +127,7 @@ export default function StockCard({ stock }) {
               activeDot={{
                 r: 4,
                 fill: chartColor,
-                stroke: '#0d1520',
+                stroke: 'var(--surface)',
                 strokeWidth: 2,
               }}
             />

@@ -22,6 +22,10 @@ export default function AnalysisPanel({ stock, loading, error }) {
           <span className="ai-dot" />
           {t.analysis.poweredBy}
         </div>
+        <div className="analysis-loading-row">
+          <div className="spinner spinner-sm" />
+          <div className="loading-text">{t.states.loading}</div>
+        </div>
         <div className="analysis-skeleton">
           <div className="skeleton-line" />
           <div className="skeleton-line" />
@@ -85,6 +89,25 @@ export default function AnalysisPanel({ stock, loading, error }) {
           <span className="conviction-label">{t.analysis.conviction[convictionKey]}</span>
         </div>
       </div>
+
+      {stock.reasoningFactors?.length > 0 && (
+        <div className="reasoning-section">
+          <div className="pred-label">{t.analysis.whyThisScore}</div>
+          <div className="factor-chips">
+            {stock.reasoningFactors.map((f, i) => (
+              <div key={i} className={'factor-chip ' + (f.lean || 'neutral')}>
+                <div className="factor-chip-head">
+                  <span className="factor-chip-arrow">
+                    {f.lean === 'bullish' ? '▲' : f.lean === 'bearish' ? '▼' : '●'}
+                  </span>
+                  <span className="factor-chip-name">{lang === 'he' ? f.factorHe : f.factor}</span>
+                </div>
+                <div className="factor-chip-note">{lang === 'he' ? f.noteHe : f.note}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="targets">
         <div className="target">

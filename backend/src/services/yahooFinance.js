@@ -283,7 +283,7 @@ async function fetchBundle(symbol) {
   };
 }
 
-function toTATicker(ticker) {
+export function toTATicker(ticker) {
   const t = ticker.trim().toUpperCase();
   return t.endsWith('.TA') ? t : `${t}.TA`;
 }

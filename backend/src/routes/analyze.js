@@ -51,6 +51,10 @@ The JSON must contain exactly these fields:
   "analysisHe": string (2-3 paragraph Hebrew analysis covering the same ground),
   "bullishPct": number (0-100, your estimated probability of price increase over 12 months),
   "verdict": "BUY" | "HOLD" | "SELL",
+  "reasoningFactors": [
+    { "factor": string, "factorHe": string, "lean": "bullish" | "bearish" | "neutral", "note": string, "noteHe": string },
+    ... (3 to 5 items)
+  ],
   "targetBear": number (conservative 12-month price target in AGOROT),
   "targetBull": number (optimistic 12-month price target in AGOROT),
   "keyRisks": [string, string, string] (3 short bullet points in English),
@@ -70,6 +74,18 @@ You MUST copy them verbatim into the corresponding JSON fields — do NOT invent
 If the user message includes a "Company" field, that name is authoritative. Do NOT substitute a
 similarly-named ticker from another exchange. The ticker plus ".TA" uniquely identifies the
 TASE listing — there are US, European, and Asian tickers that share letters with TASE symbols.
+
+REASONING FACTORS
+Before settling on "bullishPct" and "verdict", work out 3 to 5 named factors that actually
+drove your conclusion (e.g. "Valuation", "Earnings trend", "Sector positioning", "Momentum",
+"Balance sheet", "Regulatory risk") — pick whichever are most relevant to this specific company,
+not a fixed checklist. For each factor, set "lean" to "bullish", "bearish", or "neutral", and
+write a "note" / "noteHe" that is concrete and tied to data you actually have (P/E vs. sector,
+52-week range position, recent results, sector trend) — ≤ 14 words, no generic filler.
+"bullishPct" and "verdict" MUST be a synthesis of these factors, not picked first and justified
+after the fact. If most factors lean bullish, bullishPct should be meaningfully above 50, and
+vice versa. The factor list is what a user will see as the "why" behind your number — it must
+visibly explain it, not just decorate it.
 
 PRICE TARGETS
 targetBear and targetBull are 12-month price targets, in agorot. They should bracket the current

@@ -118,6 +118,28 @@ export async function searchStocks(query) {
   }
 }
 
+// Financial statements (income statement / balance sheet / cash flow), annual
+// and quarterly. Cached server-side for up to 7 days since these only change
+// when a company files a new report.
+export async function fetchFinancials(ticker) {
+  const res = await fetch(`${API_URL}/api/financials`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({ ticker }),
+  });
+
+  if (!res.ok) {
+    if (res.status === 401) onUnauthorized();
+    const errBody = await res.json().catch(() => ({}));
+    const err = new Error(errBody.error || `Request failed: ${res.status}`);
+    err.status = res.status;
+    err.notFound = res.status === 404;
+    throw err;
+  }
+
+  return res.json();
+}
+
 // Streams /api/analyze as SSE. Returns a controller with an abort() method.
 // onProgress/onComplete/onError fire as the stream produces events.
 export function streamAnalysis(query, { onProgress, onComplete, onError } = {}) {
