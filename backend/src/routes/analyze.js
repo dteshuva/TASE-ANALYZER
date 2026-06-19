@@ -9,8 +9,11 @@ const anthropic = new Anthropic({
 });
 
 const MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-4-6';
-const CACHE_TTL = parseInt(process.env.CACHE_TTL_SECONDS || '300', 10) * 1000;
+const CACHE_TTL = parseInt(process.env.CACHE_TTL_SECONDS || '86400', 10) * 1000;
 
+// Caches only the AI-derived analysis (text, verdict, targets, etc), keyed by
+// resolved ticker. Price/market data is always refetched live and merged in,
+// so a cache hit never serves stale price data even at a 24h TTL.
 const analysisCache = new Map();
 
 function getCached(key) {
@@ -116,6 +119,30 @@ EXAMPLES OF COMMON TASE TICKERS (for orientation, NOT authoritative — always d
 
 Final reminder: output ONLY the JSON object. No \`\`\`json fences, no leading text, no explanation.`;
 
+// Merges AI-derived analysis fields with a fresh price snapshot. `analysis` is
+// either freshly parsed from Claude or pulled from the cache; `realPriceData`
+// is always live, so price/market-cap shown are never stale even on a cache hit.
+function buildResult(analysis, realPriceData, chartData, cached) {
+  return {
+    ...analysis,
+    cached,
+    companyName: realPriceData.longName || realPriceData.shortName || analysis.companyName,
+    sector: realPriceData.sector ?? analysis.sector,
+    industry: realPriceData.industry ?? null,
+    currentPrice: realPriceData.currentPrice ?? analysis.currentPrice,
+    priceChange: realPriceData.priceChange ?? analysis.priceChange,
+    high52: realPriceData.high52 ?? analysis.high52,
+    low52: realPriceData.low52 ?? analysis.low52,
+    pe: realPriceData.pe != null ? String(realPriceData.pe) : analysis.pe,
+    marketCap: realPriceData.marketCap != null
+      ? `₪${(realPriceData.marketCap / 1e9).toFixed(1)}B`
+      : analysis.marketCap,
+    realPriceData,
+    priceDataFresh: true,
+    chartData,
+  };
+}
+
 router.post('/', async (req, res, next) => {
   try {
     const { query } = req.body || {};
@@ -123,9 +150,6 @@ router.post('/', async (req, res, next) => {
     if (!query || typeof query !== 'string' || query.length > 100) {
       return res.status(400).json({ error: 'Invalid query' });
     }
-
-    const cacheKey = query.trim().toLowerCase();
-    const cached = getCached(cacheKey);
 
     // SSE setup
     res.writeHead(200, {
@@ -139,12 +163,8 @@ router.post('/', async (req, res, next) => {
       res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
     };
 
-    if (cached) {
-      sendEvent('complete', { ...cached, cached: true });
-      return res.end();
-    }
-
-    // Accepts a ticker ("TEVA") or a company name ("bank leumi").
+    // Accepts a ticker ("TEVA") or a company name ("bank leumi"). Price data
+    // is always fetched live (Yahoo data itself is cached for 60s upstream).
     let realPriceData, chartData;
     try {
       const bundle = await loadTASEStock(query);
@@ -160,6 +180,16 @@ router.post('/', async (req, res, next) => {
       } else {
         sendEvent('error', { error: yahooErr.message || 'Market data unavailable' });
       }
+      return res.end();
+    }
+
+    // Cache is keyed by the resolved ticker, not the raw search string, so
+    // "TEVA" and "teva pharmaceutical" share one cached analysis.
+    const cacheKey = realPriceData.ticker.toLowerCase();
+    const cachedAnalysis = getCached(cacheKey);
+
+    if (cachedAnalysis) {
+      sendEvent('complete', buildResult(cachedAnalysis, realPriceData, chartData, true));
       return res.end();
     }
 
@@ -224,29 +254,8 @@ router.post('/', async (req, res, next) => {
       return res.end();
     }
 
-    // Override with Yahoo's ground-truth values so Claude can't drift.
-    const result = {
-      ...parsed,
-      cached: false,
-      companyName: realPriceData.longName || realPriceData.shortName || parsed.companyName,
-      // Prefer Yahoo's sourced sector; fall back to the AI's only if Yahoo has none.
-      sector: realPriceData.sector ?? parsed.sector,
-      industry: realPriceData.industry ?? null,
-      currentPrice: realPriceData.currentPrice ?? parsed.currentPrice,
-      priceChange: realPriceData.priceChange ?? parsed.priceChange,
-      high52: realPriceData.high52 ?? parsed.high52,
-      low52: realPriceData.low52 ?? parsed.low52,
-      pe: realPriceData.pe != null ? String(realPriceData.pe) : parsed.pe,
-      marketCap: realPriceData.marketCap != null
-        ? `₪${(realPriceData.marketCap / 1e9).toFixed(1)}B`
-        : parsed.marketCap,
-      realPriceData,
-      priceDataFresh: true,
-      chartData,
-    };
-
-    setCached(cacheKey, result);
-    sendEvent('complete', result);
+    setCached(cacheKey, parsed);
+    sendEvent('complete', buildResult(parsed, realPriceData, chartData, false));
     res.end();
   } catch (err) {
     if (!res.headersSent) {
