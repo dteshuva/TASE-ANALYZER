@@ -1,6 +1,7 @@
 import express from 'express';
 import Anthropic from '@anthropic-ai/sdk';
 import { loadTASEStock } from '../services/yahooFinance.js';
+import { getFinancials } from '../services/financials.js';
 
 const router = express.Router();
 
@@ -74,14 +75,50 @@ You MUST copy them verbatim into the corresponding JSON fields — do NOT invent
 If the user message includes a "Company" field, that name is authoritative. Do NOT substitute a
 similarly-named ticker from another exchange. The ticker plus ".TA" uniquely identifies the
 TASE listing — there are US, European, and Asian tickers that share letters with TASE symbols.
+If the user message includes "Financial Statements", treat those figures and the derived ratios
+(margins, CAGR, leverage, coverage, ROE/ROA, FCF margin, quarterly YoY) as authoritative actuals
+for this company — do NOT invent different revenue/earnings/ratio numbers. They are in the
+company's own reporting currency (often USD for dual-listed names, not always ILS) — do not
+convert them or treat them as agorot/ILS. A "—" means that line item is not reported under that
+company's statement structure (e.g. banks do not report COGS/gross profit/operating income), not
+that the value is zero — do not infer weakness from a "—". If no "Financial Statements" section
+is present, fall back to your general knowledge of the company's fundamentals, but do not
+fabricate specific figures.
+
+INDUSTRY-RELEVANT METRICS
+Not every metric matters for every business. Weight the metrics that fit THIS company's model and
+explicitly set aside those that don't — do not run a generic checklist, and never penalize a
+company for a metric that is irrelevant to its sector. The "Financial Statements" block is already
+tailored (irrelevant metrics are omitted and a NOTE flags the issuer type), but apply the same
+judgment in your reasoning:
+  - Banks / insurers: focus on net-interest / premium / total-income growth, net margin, ROE, ROA,
+    and capitalisation (equity/assets). IGNORE gross margin, EBITDA, Net Debt, interest coverage,
+    current ratio and free cash flow — their balance sheets are deposits-and-loans, not
+    debt-and-working-capital, so those metrics are meaningless here.
+  - REITs / real estate: emphasize NOI and FFO trajectory, occupancy, NAV, and loan-to-value
+    leverage; conventional net margin and EBITDA multiples are less informative.
+  - Pharma / biotech: R&D intensity, gross margin, pipeline depth and patent-cliff exposure drive
+    the durability of revenue more than a single year's net margin.
+  - High-growth tech / software: revenue growth, gross margin and the path to profitability / FCF
+    matter more than a trailing P/E, which often looks high for structural reasons.
+  - Capital-intensive industrials / energy / shipping: leverage (Net Debt/EBITDA), interest
+    coverage, the capex cycle and FCF conversion are central.
+Do NOT cite a metric in reasoningFactors or the narrative if it is structurally irrelevant to the
+business. The point of a professional analysis is choosing the right lens for the company, not
+applying the same lens to everything.
 
 REASONING FACTORS
 Before settling on "bullishPct" and "verdict", work out 3 to 5 named factors that actually
-drove your conclusion (e.g. "Valuation", "Earnings trend", "Sector positioning", "Momentum",
-"Balance sheet", "Regulatory risk") — pick whichever are most relevant to this specific company,
-not a fixed checklist. For each factor, set "lean" to "bullish", "bearish", or "neutral", and
-write a "note" / "noteHe" that is concrete and tied to data you actually have (P/E vs. sector,
-52-week range position, recent results, sector trend) — ≤ 14 words, no generic filler.
+drove your conclusion (e.g. "Valuation", "Revenue growth", "Margin trajectory", "Balance sheet
+leverage", "Cash generation", "Returns on capital", "Sector positioning", "Momentum",
+"Regulatory risk") — pick whichever are most relevant to this specific company, not a fixed
+checklist. When a "Financial Statements" section is present, AT LEAST TWO factors MUST be grounded
+in it, and each such factor's "note" MUST cite a specific number from it (e.g. "Net margin
+expanded to 8.2% from -9.9% over two years", "Net Debt/EBITDA 4.3x is elevated", "FCF margin only
+6.7%", "Q1 revenue +12% YoY") — do not lean only on price action and P/E. Distinguish level from
+trajectory: a metric can be weak in absolute terms yet improving, or strong yet deteriorating —
+say which. For each factor, set "lean" to "bullish", "bearish", or "neutral", and write a "note" /
+"noteHe" that is concrete and quantified — ≤ 16 words, no generic filler.
 "bullishPct" and "verdict" MUST be a synthesis of these factors, not picked first and justified
 after the fact. If most factors lean bullish, bullishPct should be meaningfully above 50, and
 vice versa. The factor list is what a user will see as the "why" behind your number — it must
@@ -97,9 +134,15 @@ Do not produce flat targets equal to current price.
 
 ANALYSIS QUALITY
 Base the analysis on real knowledge of the company: its business segments, recent results,
-competitive position, regulatory environment, and sector trends. Be realistic and nuanced;
-avoid generic boilerplate. Hebrew text must be natural Hebrew, not transliteration.
-Each "analysisEn" / "analysisHe" should be 2-3 short paragraphs, not a single block.
+competitive position, regulatory environment, and sector trends. When "Financial Statements"
+data is provided, structure the narrative like a real equity note: lead with how the business
+is performing (revenue trajectory and margin trend over the listed years), then assess balance-
+sheet health (leverage, coverage, liquidity) and cash generation (FCF), then connect that to
+valuation (does the current P/E look cheap or rich GIVEN these fundamentals?). Quote actual
+figures — e.g. "revenue grew 9% YoY to ₪24B as net margin reached 40.9%, but Net Debt/EBITDA of
+4.3x limits flexibility" — never speak only in generalities. Be realistic and nuanced; flag where
+fundamentals and price disagree. Hebrew text must be natural Hebrew, not transliteration. Each
+"analysisEn" / "analysisHe" should be 2-3 short paragraphs, not a single block.
 
 KEY RISKS / CATALYSTS
 Exactly 3 items each. Short — each item ≤ 12 words. Specific to the company, not generic
@@ -157,6 +200,196 @@ function buildResult(analysis, realPriceData, chartData, cached) {
     priceDataFresh: true,
     chartData,
   };
+}
+
+function fmtAmount(n) {
+  if (n == null) return '—';
+  const abs = Math.abs(n);
+  if (abs >= 1e9) return `${(n / 1e9).toFixed(2)}B`;
+  if (abs >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
+  if (abs >= 1e3) return `${(n / 1e3).toFixed(1)}K`;
+  return String(n);
+}
+
+function pct(numerator, denominator) {
+  if (numerator == null || denominator == null || denominator === 0) return null;
+  return (numerator / denominator) * 100;
+}
+
+function ratio(numerator, denominator) {
+  if (numerator == null || denominator == null || denominator === 0) return null;
+  return numerator / denominator;
+}
+
+function fmtPct(n) {
+  return n == null ? '—' : `${n.toFixed(1)}%`;
+}
+
+function fmtMult(n) {
+  return n == null ? '—' : `${n.toFixed(1)}x`;
+}
+
+function fmtSigned(n) {
+  if (n == null) return '—';
+  return `${n >= 0 ? '+' : ''}${n.toFixed(1)}%`;
+}
+
+function quarterLabel(date) {
+  if (!date) return '?';
+  const d = new Date(date);
+  return `Q${Math.floor(d.getMonth() / 3) + 1} ${d.getFullYear()}`;
+}
+
+const fyLabel = (date) => (date ? `FY${new Date(date).getFullYear()}` : 'FY?');
+
+// Detects issuers whose statements don't follow the industrial COGS→gross→
+// operating→net structure — banks and insurers. For these, leverage/EBITDA/
+// FCF/current-ratio metrics are not just missing, they're conceptually wrong
+// (a bank's "debt" is its funding base; "net debt" is meaningless), so we omit
+// them rather than feed Claude misleading numbers. We trust the sector label
+// first and fall back to the structural fingerprint (no gross profit AND no
+// operating income reported in any period) when the label is absent.
+function isFinancialIssuer(incomePeriods, sector) {
+  if (/financ|bank|insur|capital market/i.test(sector || '')) return true;
+  if (incomePeriods.length === 0) return false;
+  const reportsGross = incomePeriods.some((p) => p.grossProfit != null);
+  const reportsOperating = incomePeriods.some((p) => p.operatingIncome != null);
+  return !reportsGross && !reportsOperating;
+}
+
+// Builds a compact, analyst-grade text block from the cached financial-statements
+// record so Claude can ground the verdict/analysis in real fundamentals, not just
+// the price snapshot. We don't just dump line items — we compute the derived
+// metrics an equity analyst actually reasons over (margin trajectory, leverage,
+// interest coverage, returns on capital, cash conversion, and YoY quarterly
+// momentum) AND tailor which of them to show to the company's business model:
+// metrics that are structurally meaningless for the issuer (e.g. Net Debt or
+// EBITDA for a bank) are dropped entirely so they can't mislead the analysis.
+// Numbers are in the company's own reporting currency (often USD for dual-listed
+// names like TEVA), explicitly flagged since it is NOT always ILS. "—" denotes a
+// line item the statement structure doesn't report, never a zero.
+function summarizeFinancials(record, { sector } = {}) {
+  if (!record) return null;
+
+  // Up to 4 fiscal years gives a real trend (and a meaningful revenue CAGR)
+  // while staying compact enough to keep the prompt cheap.
+  const annualIncome = record.annual.income.slice(-4);
+  const balanceSheets = record.annual.balanceSheet;
+  const annualBalance = balanceSheets[balanceSheets.length - 1];
+  const annualCashFlow = record.annual.cashFlow[record.annual.cashFlow.length - 1];
+  const quarters = record.quarterly.income;
+  const latestQ = quarters[quarters.length - 1];
+  // Same fiscal quarter one year earlier (4 quarters back) for clean YoY momentum
+  // that isn't distorted by seasonality — only used if the period actually lines up.
+  const yearAgoQ = quarters.length >= 5 ? quarters[quarters.length - 5] : null;
+
+  if (annualIncome.length === 0 && !annualBalance && !annualCashFlow) return null;
+
+  const financial = isFinancialIssuer(record.annual.income, sector);
+  const latest = annualIncome[annualIncome.length - 1];
+
+  // ---- Income trend (per fiscal year) ----
+  // For financials we drop the gross/operating/EBITDA columns (all structurally
+  // "—") and show only the metrics that actually describe a bank's earnings.
+  const incomeLines = annualIncome.map((p) => {
+    const netM = fmtPct(pct(p.netIncome, p.totalRevenue));
+    if (financial) {
+      return `    ${fyLabel(p.date)}: Revenue ${fmtAmount(p.totalRevenue)} | Net ${netM} | Dil.EPS ${p.dilutedEPS ?? '—'}`;
+    }
+    const grossM = fmtPct(pct(p.grossProfit, p.totalRevenue));
+    const opM = fmtPct(pct(p.operatingIncome, p.totalRevenue));
+    const ebitdaM = fmtPct(pct(p.EBITDA, p.totalRevenue));
+    return `    ${fyLabel(p.date)}: Revenue ${fmtAmount(p.totalRevenue)} | Gross ${grossM} | ` +
+      `Op ${opM} | EBITDA ${ebitdaM} | Net ${netM} | Dil.EPS ${p.dilutedEPS ?? '—'}`;
+  });
+
+  // Revenue CAGR + latest-year YoY across the shown window.
+  const trendBits = [];
+  if (annualIncome.length >= 2) {
+    const first = annualIncome[0];
+    const prev = annualIncome[annualIncome.length - 2];
+    const yoy = pct(latest.totalRevenue - prev.totalRevenue, prev.totalRevenue);
+    if (yoy != null) trendBits.push(`latest-FY YoY ${fmtSigned(yoy)}`);
+    const years = annualIncome.length - 1;
+    if (first.totalRevenue > 0 && latest.totalRevenue > 0 && years >= 2) {
+      const cagr = (Math.pow(latest.totalRevenue / first.totalRevenue, 1 / years) - 1) * 100;
+      trendBits.push(`${years}yr revenue CAGR ${fmtSigned(cagr)}`);
+    }
+  }
+  const revLabel = financial ? 'Revenue (total income)' : 'Revenue';
+  const trendLine = trendBits.length ? `    ${revLabel} trend: ${trendBits.join(', ')}\n` : '';
+
+  // ---- Balance sheet & returns (most recent FY) ----
+  let balanceBlock = '';
+  if (annualBalance) {
+    const b = annualBalance;
+    const roe = pct(latest?.netIncome, b.stockholdersEquity);
+    const roa = pct(latest?.netIncome, b.totalAssets);
+    if (financial) {
+      // Banks: size + capitalisation + returns. No net-debt/coverage/current-ratio
+      // (their balance sheet is deposits-and-loans, not debt-and-working-capital).
+      const equityToAssets = pct(b.stockholdersEquity, b.totalAssets);
+      balanceBlock =
+        `  BALANCE SHEET (${fyLabel(b.date)}):\n` +
+        `    Total Assets ${fmtAmount(b.totalAssets)} | Equity ${fmtAmount(b.stockholdersEquity)} | ` +
+        `Equity/Assets ${fmtPct(equityToAssets)}\n` +
+        `    Returns: ROE ${fmtPct(roe)} | ROA ${fmtPct(roa)}\n`;
+    } else {
+      const netDebt = (b.totalDebt != null && b.cashAndCashEquivalents != null)
+        ? b.totalDebt - b.cashAndCashEquivalents : null;
+      const debtEquity = pct(b.totalDebt, b.stockholdersEquity);
+      const currentRatio = ratio(b.currentAssets, b.currentLiabilities);
+      const netDebtEbitda = (netDebt != null && latest?.EBITDA > 0) ? netDebt / latest.EBITDA : null;
+      const intCover = (latest?.operatingIncome != null && latest?.interestExpense > 0)
+        ? latest.operatingIncome / latest.interestExpense : null;
+      balanceBlock =
+        `  BALANCE SHEET (${fyLabel(b.date)}):\n` +
+        `    Assets ${fmtAmount(b.totalAssets)} | Equity ${fmtAmount(b.stockholdersEquity)} | ` +
+        `Total Debt ${fmtAmount(b.totalDebt)} | Cash ${fmtAmount(b.cashAndCashEquivalents)} | Net Debt ${fmtAmount(netDebt)}\n` +
+        `    Leverage: Debt/Equity ${fmtPct(debtEquity)} | Net Debt/EBITDA ${fmtMult(netDebtEbitda)} | ` +
+        `Interest Coverage ${fmtMult(intCover)} | Current Ratio ${fmtMult(currentRatio)}\n` +
+        `    Returns: ROE ${fmtPct(roe)} | ROA ${fmtPct(roa)}\n`;
+    }
+  }
+
+  // ---- Cash generation (most recent FY) ----
+  // Operating/free cash flow and FCF margin are core for industrials but are
+  // not a meaningful read on a bank's health, so we omit the block for financials.
+  let cashBlock = '';
+  if (annualCashFlow && !financial) {
+    const c = annualCashFlow;
+    const fcfMargin = pct(c.freeCashFlow, latest?.totalRevenue);
+    cashBlock =
+      `  CASH FLOW (${fyLabel(c.date)}):\n` +
+      `    Operating CF ${fmtAmount(c.operatingCashFlow)} | CapEx ${fmtAmount(c.capitalExpenditure)} | ` +
+      `Free CF ${fmtAmount(c.freeCashFlow)} | FCF Margin ${fmtPct(fcfMargin)}\n`;
+  }
+
+  // ---- Quarterly momentum (latest reported quarter, YoY) ----
+  let quarterBlock = '';
+  if (latestQ) {
+    const revYoY = yearAgoQ ? pct(latestQ.totalRevenue - yearAgoQ.totalRevenue, yearAgoQ.totalRevenue) : null;
+    const niYoY = (yearAgoQ && yearAgoQ.netIncome) ? pct(latestQ.netIncome - yearAgoQ.netIncome, yearAgoQ.netIncome) : null;
+    quarterBlock =
+      `  QUARTERLY MOMENTUM (${quarterLabel(latestQ.date)}, most recent):\n` +
+      `    Revenue ${fmtAmount(latestQ.totalRevenue)}${revYoY != null ? ` (YoY ${fmtSigned(revYoY)})` : ''} | ` +
+      `Net Income ${fmtAmount(latestQ.netIncome)}${niYoY != null ? ` (YoY ${fmtSigned(niYoY)})` : ''}\n`;
+  }
+
+  const modelNote = financial
+    ? `  NOTE: ${sector || 'Financial'} issuer — gross/operating margin, EBITDA, Net Debt, coverage, ` +
+      `current ratio and free cash flow do NOT apply to this business model and are deliberately omitted. ` +
+      `Judge it on revenue/income growth, net margin, ROE/ROA and capitalisation.\n`
+    : '';
+
+  return `Financial Statements (source: Yahoo Finance; figures in the company's OWN reporting currency — NOT necessarily ILS, so do not treat as agorot; "—" = line item not reported under this company's statement structure):\n` +
+    modelNote +
+    `  INCOME (annual):\n` +
+    `${incomeLines.join('\n')}\n` +
+    trendLine +
+    balanceBlock +
+    cashBlock +
+    quarterBlock;
 }
 
 router.post('/', async (req, res, next) => {
@@ -224,7 +457,18 @@ router.post('/', async (req, res, next) => {
       .filter(Boolean)
       .join('\n');
 
-    const userMessage = `Analyze this TASE stock: ${query}\n\nCurrent market data (as of ${new Date(realPriceData.timestamp).toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' })}):\n${priceInfo}\n\nThe "Company" field above is the authoritative TASE-listed company for this ticker — do NOT confuse it with similarly-named tickers on other exchanges.`;
+    // Financial statements are best-effort: Yahoo's fundamentals endpoint can
+    // be slow or missing for some tickers, and that must never block an
+    // analysis that otherwise only needs the price snapshot above.
+    let financialsSummary = null;
+    try {
+      const financialsRecord = await getFinancials(realPriceData.ticker);
+      financialsSummary = summarizeFinancials(financialsRecord, { sector: realPriceData.sector });
+    } catch (financialsErr) {
+      console.error('[financials fetch error]', financialsErr.message);
+    }
+
+    const userMessage = `Analyze this TASE stock: ${query}\n\nCurrent market data (as of ${new Date(realPriceData.timestamp).toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' })}):\n${priceInfo}\n\nThe "Company" field above is the authoritative TASE-listed company for this ticker — do NOT confuse it with similarly-named tickers on other exchanges.${financialsSummary ? `\n\n${financialsSummary}` : ''}`;
 
     let buffer = '';
     let tokensReceived = 0;

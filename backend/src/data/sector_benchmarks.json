@@ -357,7 +357,7 @@
   "Real Estate": {
     "sector": "Real Estate",
     "label": "Real Estate",
-    "computedAt": 1781845844021,
+    "computedAt": 1782062522492,
     "window": {
       "months": 12
     },
@@ -368,141 +368,141 @@
       {
         "ticker": "AZRG",
         "weight": 17.1834,
-        "return": 46.2
+        "return": 41.9
       },
       {
         "ticker": "BIG",
         "weight": 11.4323,
-        "return": 14.4
+        "return": 12.9
       },
       {
         "ticker": "MLSR",
         "weight": 9.7019,
-        "return": 21.6
+        "return": 16.3
       },
       {
         "ticker": "MVNE",
         "weight": 7.6715,
-        "return": 17
+        "return": 13.2
       },
       {
         "ticker": "ALHE",
         "weight": 5.2711,
-        "return": 6.4
+        "return": 1.3
       },
       {
         "ticker": "AMOT",
         "weight": 4.6809,
-        "return": -11
+        "return": -11.8
       },
       {
         "ticker": "RIT1",
         "weight": 3.4407,
-        "return": 1.2
+        "return": 2
       },
       {
         "ticker": "DIMRI",
         "weight": 3.0206,
-        "return": 0
+        "return": -2.7
       },
       {
         "ticker": "ISCN",
         "weight": 2.6005,
-        "return": 43.7
+        "return": 35.7
       },
       {
         "ticker": "ARPT",
         "weight": 2.2204,
-        "return": -6.9
+        "return": -8.3
       },
       {
         "ticker": "ARGO",
         "weight": 2.1704,
-        "return": 22.2
+        "return": 27.2
       },
       {
         "ticker": "AURA",
         "weight": 2.1504,
-        "return": -12
+        "return": -18
       },
       {
         "ticker": "SLARL",
         "weight": 2.1304,
-        "return": -6.3
+        "return": -8.4
       },
       {
         "ticker": "GVYM",
         "weight": 1.9304,
-        "return": 14
+        "return": 11.2
       },
       {
         "ticker": "BLSR",
         "weight": 1.4003,
-        "return": -3.9
+        "return": -4.8
       },
       {
         "ticker": "ELCRE",
         "weight": 1.1702,
-        "return": -0.5
+        "return": -1.1
       },
       {
         "ticker": "AFPR",
         "weight": 0.9502,
-        "return": -4.2
+        "return": -1.2
       },
       {
         "ticker": "SMT",
         "weight": 0.9102,
-        "return": -19.4
+        "return": -21.1
       },
       {
         "ticker": "ACRO",
         "weight": 0.7902,
-        "return": -8.7
+        "return": -10.3
       },
       {
         "ticker": "IES",
         "weight": 0.7802,
-        "return": 192.5
+        "return": 193
       },
       {
         "ticker": "AFRE",
         "weight": 0.7702,
-        "return": -21.7
+        "return": -24
       },
       {
         "ticker": "AZRM",
         "weight": 0.7702,
-        "return": -15.6
+        "return": -18.6
       },
       {
         "ticker": "PRSK",
         "weight": 0.6601,
-        "return": 42.3
+        "return": 39
       },
       {
         "ticker": "ISRS",
         "weight": 0.5401,
-        "return": -2.9
+        "return": -3.6
       },
       {
         "ticker": "PTBL",
         "weight": 0.4101,
-        "return": 13.8
+        "return": 5.5
       },
       {
         "ticker": "VILR",
         "weight": 0.3701,
-        "return": -10.1
+        "return": -10
       }
     ],
-    "return12m": 18,
+    "return12m": 15,
     "series": null
   },
   "Energy": {
     "sector": "Energy",
     "label": "Energy",
-    "computedAt": 1781899920127,
+    "computedAt": 1782062718228,
     "window": {
       "months": 12
     },
@@ -513,17 +513,17 @@
       {
         "ticker": "NWMD",
         "weight": 16.9317,
-        "return": 3
+        "return": 1.8
       },
       {
         "ticker": "PAZ",
         "weight": 15.6216,
-        "return": 39.7
+        "return": 35.4
       },
       {
         "ticker": "DLEKG",
         "weight": 14.5715,
-        "return": 12
+        "return": 9.8
       },
       {
         "ticker": "ENOG",
@@ -533,25 +533,25 @@
       {
         "ticker": "ORL",
         "weight": 5.0705,
-        "return": 67.6
+        "return": 66.7
       },
       {
         "ticker": "EQTL",
         "weight": 2.0802,
-        "return": -23.1
+        "return": -23.7
       },
       {
         "ticker": "LAPD",
         "weight": 1.2701,
-        "return": 6.2
+        "return": 3.9
       },
       {
         "ticker": "TMRP",
         "weight": 0.6801,
-        "return": -37
+        "return": -36.6
       }
     ],
-    "return12m": 14,
+    "return12m": 11.9,
     "series": null
   },
   "Financials": {
