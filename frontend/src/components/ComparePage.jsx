@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useI18n } from '../i18n/I18nContext.jsx';
 import { useSettings } from '../settings/SettingsContext.jsx';
 import { fetchQuote, streamAnalysis, searchStocks } from '../services/api.js';
+import { localSearchStocks, mergeStockResults } from '../data/taseStocks.js';
 
 // Compact autocomplete search box used for each side of the comparison.
 function CompareSearch({ label, placeholder, onSelect }) {
@@ -22,12 +23,24 @@ function CompareSearch({ label, placeholder, onSelect }) {
       setOpen(false);
       return;
     }
+    // Instant local TA-125 match, then a debounced Yahoo search for the long tail.
+    const local = localSearchStocks(q);
+    setResults(local);
+    setOpen(local.length > 0);
+    if (local.length >= 7) return;
+
+    let cancelled = false;
     const id = setTimeout(async () => {
-      const { results: r } = await searchStocks(q);
-      setResults(r || []);
-      setOpen((r || []).length > 0);
-    }, 350);
-    return () => clearTimeout(id);
+      const { results: remote } = await searchStocks(q);
+      if (cancelled) return;
+      const merged = mergeStockResults(local, remote);
+      setResults(merged);
+      setOpen(merged.length > 0);
+    }, 250);
+    return () => {
+      cancelled = true;
+      clearTimeout(id);
+    };
   }, [text]);
 
   useEffect(() => {

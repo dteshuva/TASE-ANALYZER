@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import YahooFinance from 'yahoo-finance2';
-import { toTATicker } from './yahooFinance.js';
+import { toTATicker, withRetry, timeoutFetch } from './yahooFinance.js';
 
 // Curated line items per statement: the older yahoo-finance2 quoteSummary
 // submodules (incomeStatementHistory etc.) have returned almost no data since
@@ -68,6 +68,10 @@ const MODULE_BY_STATEMENT = {
 const yf = new YahooFinance({
   suppressNotices: ['yahooSurvey', 'ripHistorical'],
   validation: { allowAdditionalProps: true, logErrors: false },
+  // Same per-request timeout the live-quote instance uses: yahoo-finance2 has no
+  // built-in fetch timeout, so a single stalled fundamentals call would hang the
+  // whole 6-statement fetch until the client gives up. Fail fast instead.
+  fetch: timeoutFetch,
 });
 
 // Financial statements only change when a company files a new quarterly/annual
@@ -94,28 +98,52 @@ function pickLineItems(period, keys) {
   return row;
 }
 
+// Each statement is fetched with the same retry policy the live-quote path uses.
+// Yahoo throttles bursts (a single stock view fires this 6-wide AND warms a
+// sector peer-basket of up to ~28 tickers in parallel), surfacing as transient
+// "fetch failed" / timeout errors that clear on a quick retry — without this,
+// one unlucky call would 502 the whole financials page.
 async function fetchStatement(ticker, statement, type) {
-  const period1 = '2018-01-01';
-  const periods = await yf.fundamentalsTimeSeries(ticker, {
-    period1,
-    type,
-    module: MODULE_BY_STATEMENT[statement],
+  return withRetry(async () => {
+    const period1 = '2018-01-01';
+    const periods = await yf.fundamentalsTimeSeries(ticker, {
+      period1,
+      type,
+      module: MODULE_BY_STATEMENT[statement],
+    });
+    return periods
+      .map((p) => pickLineItems(p, LINE_ITEMS[statement]))
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
   });
-  return periods
-    .map((p) => pickLineItems(p, LINE_ITEMS[statement]))
-    .sort((a, b) => new Date(a.date) - new Date(b.date));
 }
 
 async function computeFinancials(ticker) {
+  // allSettled, not all: a single statement that still fails after retries (e.g.
+  // Yahoo doesn't report cash flow for some issuers) must not blank the entire
+  // page. We serve every statement that came back and leave the rest as [].
+  const statements = [
+    ['income', 'annual'], ['balanceSheet', 'annual'], ['cashFlow', 'annual'],
+    ['income', 'quarterly'], ['balanceSheet', 'quarterly'], ['cashFlow', 'quarterly'],
+  ];
+  const settled = await Promise.allSettled(
+    statements.map(([s, t]) => fetchStatement(ticker, s, t))
+  );
+
+  const unwrap = (idx, label) => {
+    const r = settled[idx];
+    if (r.status === 'fulfilled') return r.value;
+    console.error(`[financials] ${ticker} ${label} failed:`, r.reason?.message);
+    return [];
+  };
   const [incomeAnnual, balanceSheetAnnual, cashFlowAnnual, incomeQuarterly, balanceSheetQuarterly, cashFlowQuarterly] =
-    await Promise.all([
-      fetchStatement(ticker, 'income', 'annual'),
-      fetchStatement(ticker, 'balanceSheet', 'annual'),
-      fetchStatement(ticker, 'cashFlow', 'annual'),
-      fetchStatement(ticker, 'income', 'quarterly'),
-      fetchStatement(ticker, 'balanceSheet', 'quarterly'),
-      fetchStatement(ticker, 'cashFlow', 'quarterly'),
-    ]);
+    statements.map(([s, t], i) => unwrap(i, `${s}/${t}`));
+
+  // If every statement failed, this is a real error (bad ticker / Yahoo down) —
+  // throw so the caller serves the existing cache or a 502, rather than caching
+  // an all-empty record for 7 days.
+  if (settled.every((r) => r.status === 'rejected')) {
+    throw settled[0].reason;
+  }
 
   const record = {
     ticker,

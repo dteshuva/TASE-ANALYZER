@@ -18,10 +18,12 @@ router.post('/', async (req, res, next) => {
       return res.status(400).json({ error: 'Invalid query' });
     }
 
-    // Accepts a ticker ("TEVA") or a company name ("bank leumi").
-    let stockData, chartData;
+    // Accepts a ticker ("TEVA") or a company name ("bank leumi"). The price
+    // chart is lazy-loaded separately by the frontend via /api/history, so it's
+    // intentionally not part of this response.
+    let stockData;
     try {
-      ({ stockData, chartData } = await loadTASEStock(query));
+      ({ stockData } = await loadTASEStock(query));
     } catch (yahooErr) {
       if (yahooErr.status === 404) {
         return res.status(404).json({
@@ -100,7 +102,6 @@ router.post('/', async (req, res, next) => {
       performance,
       sectorComparison,
       news,
-      chartData,
     });
   } catch (err) {
     next(err);

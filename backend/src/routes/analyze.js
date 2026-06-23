@@ -181,7 +181,7 @@ Final reminder: output ONLY the JSON object. No \`\`\`json fences, no leading te
 // Merges AI-derived analysis fields with a fresh price snapshot. `analysis` is
 // either freshly parsed from Claude or pulled from the cache; `realPriceData`
 // is always live, so price/market-cap shown are never stale even on a cache hit.
-function buildResult(analysis, realPriceData, chartData, cached) {
+function buildResult(analysis, realPriceData, cached) {
   return {
     ...analysis,
     cached,
@@ -198,7 +198,6 @@ function buildResult(analysis, realPriceData, chartData, cached) {
       : analysis.marketCap,
     realPriceData,
     priceDataFresh: true,
-    chartData,
   };
 }
 
@@ -414,11 +413,10 @@ router.post('/', async (req, res, next) => {
 
     // Accepts a ticker ("TEVA") or a company name ("bank leumi"). Price data
     // is always fetched live (Yahoo data itself is cached for 60s upstream).
-    let realPriceData, chartData;
+    let realPriceData;
     try {
       const bundle = await loadTASEStock(query);
       realPriceData = bundle.stockData;
-      chartData = bundle.chartData;
     } catch (yahooErr) {
       if (yahooErr.status === 404) {
         sendEvent('error', {
@@ -438,7 +436,7 @@ router.post('/', async (req, res, next) => {
     const cachedAnalysis = getCached(cacheKey);
 
     if (cachedAnalysis) {
-      sendEvent('complete', buildResult(cachedAnalysis, realPriceData, chartData, true));
+      sendEvent('complete', buildResult(cachedAnalysis, realPriceData, true));
       return res.end();
     }
 
@@ -515,7 +513,7 @@ router.post('/', async (req, res, next) => {
     }
 
     setCached(cacheKey, parsed);
-    sendEvent('complete', buildResult(parsed, realPriceData, chartData, false));
+    sendEvent('complete', buildResult(parsed, realPriceData, false));
     res.end();
   } catch (err) {
     if (!res.headersSent) {

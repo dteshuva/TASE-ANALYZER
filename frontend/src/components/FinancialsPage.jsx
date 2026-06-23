@@ -187,6 +187,7 @@ function StatementTable({ rows, quarterly, labels, emptyText }) {
                 })}
               </tr>
             ))}
+
           </tbody>
         </table>
       </div>

@@ -27,25 +27,45 @@ function persist() {
 // and renormalize the remaining constituents' official weights before averaging.
 const GLITCH_THRESHOLD = 200;
 
+// Max constituents fetched at once. A basket is up to ~28 tickers × 2 Yahoo calls
+// each; firing all of them in one Promise.all is the burst that trips Yahoo's
+// per-IP 429 limit. Fetching in waves of this size still pulls EVERY constituent
+// (no accuracy change — the result is identical), it just flattens the spike. The
+// warm runs in the background, so the few extra seconds are invisible to users.
+const BASKET_CONCURRENCY = 8;
+
+// Map over items with a fixed concurrency cap, preserving input order. Each worker
+// pulls the next index until the basket is drained.
+async function mapWithConcurrency(items, limit, fn) {
+  const results = new Array(items.length);
+  let next = 0;
+  const worker = async () => {
+    while (next < items.length) {
+      const i = next++;
+      results[i] = await fn(items[i], i);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+  return results;
+}
+
 // Compute (or refresh) one sector's benchmark. Heavy (one Yahoo round-trip per
 // constituent) — only ever called in the background, never on the request path.
 export async function computeSectorReturn(key) {
   const basket = SECTOR_BASKETS[key];
   if (!basket || !basket.length) return null;
 
-  const results = await Promise.all(
-    basket.map(async (c) => {
-      try {
-        const d = await fetchYahooStockData(c.ticker);
-        if (d.currentPrice == null) return null;
-        const ret = await trailing12mReturn(d.ticker, d.currentPrice);
-        if (ret == null) return null;
-        return { ticker: c.ticker, weight: c.weight, return: ret };
-      } catch {
-        return null;
-      }
-    })
-  );
+  const results = await mapWithConcurrency(basket, BASKET_CONCURRENCY, async (c) => {
+    try {
+      const d = await fetchYahooStockData(c.ticker);
+      if (d.currentPrice == null) return null;
+      const ret = await trailing12mReturn(d.ticker, d.currentPrice);
+      if (ret == null) return null;
+      return { ticker: c.ticker, weight: c.weight, return: ret };
+    } catch {
+      return null;
+    }
+  });
 
   const ok = results.filter(Boolean);
   if (!ok.length) return null;

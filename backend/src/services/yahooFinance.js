@@ -1,4 +1,42 @@
+
+
 import YahooFinance from 'yahoo-finance2';
+
+// Per-request network timeout. yahoo-finance2 has NO built-in fetch timeout, so a
+// single stalled Yahoo connection would otherwise hold its queue slot forever and
+// starve every other lookup — the "fetch failed → whole site dead for a minute"
+// cascade. Giving each fetch its own AbortSignal makes a hung call fail fast and
+// free the slot, so one bad request can't take the app down with it.
+const YAHOO_FETCH_TIMEOUT_MS = 15 * 1000;
+
+// Yahoo answers HTTP 429 ("Too Many Requests") when we've burst past its per-IP
+// rate limit. The raw Response — and its Retry-After header — only exists here in
+// the fetch wrapper; yahoo-finance2 discards it before our retry logic ever runs.
+// So we surface the 429 as a tagged error carrying exactly how long Yahoo told us
+// to wait, and withRetry honours that instead of hammering the throttle.
+class RateLimitError extends Error {
+  constructor(retryAfterMs) {
+    super('Yahoo rate limit (HTTP 429 Too Many Requests)');
+    this.code = 429;
+    this.retryAfterMs = retryAfterMs;
+  }
+}
+
+// Retry-After is either delta-seconds ("120") or an HTTP-date; null if absent.
+function parseRetryAfter(res) {
+  const h = res.headers.get('retry-after');
+  if (!h) return null;
+  const secs = Number(h);
+  if (Number.isFinite(secs)) return Math.max(0, secs * 1000);
+  const when = Date.parse(h);
+  return Number.isFinite(when) ? Math.max(0, when - Date.now()) : null;
+}
+
+export const timeoutFetch = async (url, init) => {
+  const res = await fetch(url, { ...init, signal: AbortSignal.timeout(YAHOO_FETCH_TIMEOUT_MS) });
+  if (res.status === 429) throw new RateLimitError(parseRetryAfter(res));
+  return res;
+};
 
 const yf = new YahooFinance({
   suppressNotices: ['yahooSurvey', 'ripHistorical'],
@@ -8,12 +46,24 @@ const yf = new YahooFinance({
   // working tickers whenever Yahoo tweaks its payload. Tolerate extra props and
   // don't spam the logs; we only read a handful of known fields anyway.
   validation: { allowAdditionalProps: true, logErrors: false },
+  // Keep the library's default concurrency (4) so a single quote's parallel
+  // Yahoo calls aren't serialized — the per-request timeout above, not
+  // throttling, is what prevents the old "one stuck call freezes everything"
+  // cascade, so there's no need to choke our own request rate.
+  queue: { concurrency: 4 },
+  fetch: timeoutFetch,
 });
 
 // Yahoo rate-limits bursts (the frontend fires /api/quote and /api/analyze
 // together, each doing two Yahoo calls). Those manifest as transient
-// "fetch failed" / empty-result errors that resolve on a quick retry.
-async function withRetry(fn, { attempts = 3, baseDelay = 350 } = {}) {
+// "fetch failed" / timeout / empty-result errors that resolve on a quick retry.
+export // Cap on how long we'll obey a 429's Retry-After: a real cooldown can be a full
+// minute, but these calls sit on the request path (a user is waiting), so beyond
+// this we'd rather fail fast and let the cache / partial-tolerance handle it than
+// hang the request. The basket warm runs in the background and tolerates the cap.
+const RATE_LIMIT_BACKOFF_CAP_MS = 8 * 1000;
+
+export async function withRetry(fn, { attempts = 3, baseDelay = 350 } = {}) {
   let lastErr;
   for (let i = 0; i < attempts; i++) {
     try {
@@ -23,7 +73,13 @@ async function withRetry(fn, { attempts = 3, baseDelay = 350 } = {}) {
       if (/not found|no fundamentals|delisted/i.test(err.message)) throw err;
       lastErr = err;
       if (i < attempts - 1) {
-        await new Promise((r) => setTimeout(r, baseDelay * (i + 1)));
+        // On a 429, retrying fast only digs the hole deeper (each attempt counts
+        // against Yahoo's limit and pushes the cooldown out). Wait what Yahoo
+        // asked for via Retry-After — or a seconds-scale fallback — instead of ms.
+        const delay = err.code === 429
+          ? Math.min(err.retryAfterMs ?? 2000 * (i + 1), RATE_LIMIT_BACKOFF_CAP_MS)
+          : baseDelay * (i + 1);
+        await new Promise((r) => setTimeout(r, delay));
       }
     }
   }
@@ -31,14 +87,17 @@ async function withRetry(fn, { attempts = 3, baseDelay = 350 } = {}) {
 }
 
 // Short-lived cache so /api/quote and /api/analyze share a single Yahoo round-trip
-// when fired in parallel from the frontend.
-const YAHOO_TTL = 60 * 1000;
+// when fired in parallel from the frontend. Live quotes need freshness (60s);
+// historical chart bars barely move intraday, so they're cached far longer to
+// keep the 1Y/5Y toggle from re-hitting Yahoo on every click.
+const QUOTE_TTL = 60 * 1000;
+const HISTORY_TTL = 15 * 60 * 1000;
 const stockCache = new Map();
 const historyCache = new Map();
 
-function cachedFetch(cache, key, fn) {
+function cachedFetch(cache, key, fn, ttl = QUOTE_TTL) {
   const entry = cache.get(key);
-  if (entry && Date.now() - entry.timestamp < YAHOO_TTL) {
+  if (entry && Date.now() - entry.timestamp < ttl) {
     return entry.promise;
   }
   const promise = fn();
@@ -52,9 +111,15 @@ export async function fetchYahooStockData(ticker) {
   return cachedFetch(stockCache, formattedTicker, () => doFetchStock(formattedTicker));
 }
 
-export async function fetchYahooHistory(ticker) {
+// range: '1y' (daily bars, for hover-by-day) or '5y' (weekly bars, for hover-by-week).
+export async function fetchYahooHistory(ticker, range = '1y') {
   const formattedTicker = toTATicker(ticker);
-  return cachedFetch(historyCache, formattedTicker, () => doFetchHistory(formattedTicker));
+  return cachedFetch(
+    historyCache,
+    `${formattedTicker}:${range}`,
+    () => doFetchHistory(formattedTicker, range),
+    HISTORY_TTL
+  );
 }
 
 // Trailing 12-month PRICE return (%), point-to-point: the live price vs the daily
@@ -141,13 +206,18 @@ async function doFetchStock(formattedTicker) {
   };
 }
 
-async function doFetchHistory(formattedTicker) {
+// 1y -> daily bars (hover reveals the exact day's price); 5y -> weekly bars
+// (hover reveals the week's price). Yahoo throttles how far back intraday-ish
+// intervals can go, so daily is only requested for the shorter 1y window.
+const RANGE_CONFIG = {
+  '1y': { years: 1, interval: '1d' },
+  '5y': { years: 5, interval: '1wk' },
+};
+
+async function doFetchHistory(formattedTicker, range) {
+  const config = RANGE_CONFIG[range] || RANGE_CONFIG['1y'];
   const now = new Date();
-  // Anchor period1 to the 1st of the month 12 months ago so Yahoo returns
-  // clean calendar-month buckets. An arbitrary mid-month period1 makes Yahoo
-  // drop the earliest month and shift the rest, which (combined with the
-  // timezone quirk below) mislabels every point by a month.
-  const period1 = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 12, 1));
+  const period1 = new Date(Date.UTC(now.getUTCFullYear() - config.years, now.getUTCMonth(), now.getUTCDate()));
 
   let result;
   try {
@@ -155,7 +225,7 @@ async function doFetchHistory(formattedTicker) {
       yf.chart(formattedTicker, {
         period1: period1.toISOString().slice(0, 10),
         period2: now.toISOString().slice(0, 10),
-        interval: '1mo',
+        interval: config.interval,
       })
     );
   } catch (err) {
@@ -165,20 +235,18 @@ async function doFetchHistory(formattedTicker) {
     throw e;
   }
 
-  // Yahoo timestamps each monthly bar at midnight start-of-month in the
-  // exchange timezone (Asia/Jerusalem), which in UTC is the last day of the
-  // PREVIOUS month. Deriving the label from the UTC/server-local date would
-  // shift every point a month early, so format it in the exchange timezone.
+  // Format dates in the exchange timezone — Yahoo's bar timestamps are
+  // midnight-local, and rendering them in UTC/server-local time can shift the
+  // displayed date by a day.
   const tz = result.meta?.exchangeTimezoneName || 'Asia/Jerusalem';
-  const monthFmt = new Intl.DateTimeFormat('en-US', { timeZone: tz, month: 'short' });
-  const labelFmt = new Intl.DateTimeFormat('en-US', { timeZone: tz, month: 'short', year: 'numeric' });
+  const labelFmt = new Intl.DateTimeFormat('en-US', { timeZone: tz, month: 'short', day: 'numeric', year: 'numeric' });
   return (result.quotes || [])
     .filter((q) => q.close != null)
     .map((q) => {
       const d = new Date(q.date);
       return {
-        month: monthFmt.format(d), // short label, e.g. "Jun" — X-axis tick
-        label: labelFmt.format(d), // full label, e.g. "Jun 2025" — tooltip
+        date: d.toISOString().slice(0, 10), // ISO day — used to derive sparse axis ticks
+        label: labelFmt.format(d), // full date for the tooltip, e.g. "Jun 15, 2025"
         price: Math.round(q.close),
       };
     });
@@ -269,18 +337,13 @@ export async function loadTASEStock(query) {
   throw e;
 }
 
-// Fetch price (essential) and history (supplementary) together. A history hiccup
-// degrades to an empty chart rather than failing the whole lookup.
+// Fetch the price/quote only. The price chart is deliberately NOT bundled here:
+// it's a heavy ~250-bar daily series that used to sit on the critical path of
+// every /api/quote and /api/analyze call, gating the whole lookup on a slow
+// Yahoo chart fetch. The frontend now lazy-loads it via /api/history once the
+// card is on screen, so the quote itself returns as fast as a bare price fetch.
 async function fetchBundle(symbol) {
-  const [stock, history] = await Promise.allSettled([
-    fetchYahooStockData(symbol),
-    fetchYahooHistory(symbol),
-  ]);
-  if (stock.status === 'rejected') throw stock.reason;
-  return {
-    stockData: stock.value,
-    chartData: history.status === 'fulfilled' ? history.value : [],
-  };
+  return { stockData: await fetchYahooStockData(symbol) };
 }
 
 export function toTATicker(ticker) {

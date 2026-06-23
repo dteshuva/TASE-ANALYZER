@@ -4,8 +4,18 @@ import SearchBar from '../components/SearchBar.jsx';
 import StockCard from '../components/StockCard.jsx';
 import AnalysisPanel from '../components/AnalysisPanel.jsx';
 import { fetchQuote, streamAnalysis } from '../services/api.js';
+import { getCached, setCached } from '../services/cache.js';
 import { useI18n } from '../i18n/I18nContext.jsx';
 import { useSettings } from '../settings/SettingsContext.jsx';
+
+// The stock cache is keyed by normalized text so a back-navigation (which
+// arrives as the resolved ".TA" ticker, e.g. ?q=TEVA.TA) hits the entry stored
+// under the original search and vice-versa — see the dual-key store below.
+const keyFor = (s) => `stock:${String(s).trim().toLowerCase()}`;
+
+// Mirrors AnalysisPanel's check — whether a cached stock already carries AI
+// analysis or only the bare quote (it streams in a beat after the quote).
+const hasAnalysis = (s) => Boolean(s?.analysisEn || s?.analysisHe || s?.verdict);
 
 export default function AnalyzePage() {
   const { t } = useI18n();
@@ -22,6 +32,30 @@ export default function AnalyzePage() {
 
   const streamRef = useRef(null);
 
+  // Streams the AI analysis and merges it into the stock, re-caching the
+  // enriched result under every key the stock is stored as. Reused by a fresh
+  // fetch and by a cache hit whose analysis hadn't finished before navigation.
+  const startAnalysis = useCallback(
+    (query, cacheKeys) => {
+      setLoadingAnalysis(true);
+      streamRef.current = streamAnalysis(query, {
+        onComplete: (full) => {
+          setLoadingAnalysis(false);
+          setStock((prev) => {
+            const merged = { ...(prev || {}), ...full, chartData: full.chartData || prev?.chartData };
+            cacheKeys.forEach((k) => setCached(k, merged));
+            return merged;
+          });
+        },
+        onError: (err) => {
+          setLoadingAnalysis(false);
+          setAnalysisError(err.error || t.states.error);
+        },
+      });
+    },
+    [t]
+  );
+
   const runAnalysis = useCallback(
     async (query) => {
       // Cancel any in-flight stream from a previous query
@@ -34,6 +68,20 @@ export default function AnalyzePage() {
       setSuggestions([]);
       setStock(null);
       setSearchParams({ q: query });
+
+      const queryKey = keyFor(query);
+      const cached = getCached(queryKey);
+      if (cached) {
+        setStock(cached);
+        setLoadingQuote(false);
+        // The quote was cached but the AI stream may have been aborted when the
+        // user navigated away before it finished — fill it in now without
+        // blocking the (already-painted) page.
+        if (aiEnabled && !hasAnalysis(cached)) {
+          startAnalysis(query, [queryKey, keyFor(cached.ticker)]);
+        }
+        return;
+      }
 
       let quote;
       try {
@@ -49,7 +97,11 @@ export default function AnalyzePage() {
         return;
       }
 
+      // Store under both the raw search text and the resolved ".TA" ticker, so a
+      // later back-navigation (?q=TEVA.TA) and a re-typed search (TEVA) both hit.
+      const cacheKeys = [queryKey, keyFor(quote.ticker)];
       setStock(quote);
+      cacheKeys.forEach((k) => setCached(k, quote));
       setLoadingQuote(false);
 
       // AI analysis disabled in settings — show live data only, make no Claude request.
@@ -58,24 +110,9 @@ export default function AnalyzePage() {
         return;
       }
 
-      setLoadingAnalysis(true);
-
-      streamRef.current = streamAnalysis(query, {
-        onComplete: (full) => {
-          setLoadingAnalysis(false);
-          setStock((prev) => ({
-            ...(prev || {}),
-            ...full,
-            chartData: full.chartData || prev?.chartData,
-          }));
-        },
-        onError: (err) => {
-          setLoadingAnalysis(false);
-          setAnalysisError(err.error || t.states.error);
-        },
-      });
+      startAnalysis(query, cacheKeys);
     },
-    [setSearchParams, t, aiEnabled]
+    [setSearchParams, t, aiEnabled, startAnalysis]
   );
 
   useEffect(() => {

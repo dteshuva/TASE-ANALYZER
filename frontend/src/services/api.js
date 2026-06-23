@@ -1,3 +1,5 @@
+import { getCached, setCached } from './cache.js';
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 // ---- Auth token storage -----------------------------------------------------
@@ -98,6 +100,32 @@ export async function fetchQuotes(tickers) {
   }
 
   return res.json();
+}
+
+// Lazy-loaded price history for a non-default range (currently just 5y/weekly
+// — the 1y/daily series ships bundled with /api/quote already).
+export async function fetchHistory(ticker, range) {
+  const cacheKey = `history:${ticker}:${range}`;
+  const cached = getCached(cacheKey);
+  if (cached) return cached;
+
+  const res = await fetch(`${API_URL}/api/history`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({ ticker, range }),
+  });
+
+  if (!res.ok) {
+    if (res.status === 401) onUnauthorized();
+    const errBody = await res.json().catch(() => ({}));
+    const err = new Error(errBody.error || `Request failed: ${res.status}`);
+    err.status = res.status;
+    throw err;
+  }
+
+  const data = await res.json();
+  setCached(cacheKey, data);
+  return data;
 }
 
 // Autocomplete search — returns { results: [{ ticker, name }] } for the search bar.

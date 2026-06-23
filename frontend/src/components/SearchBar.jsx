@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useI18n } from '../i18n/I18nContext.jsx';
 import { searchStocks } from '../services/api.js';
+import { localSearchStocks, mergeStockResults } from '../data/taseStocks.js';
 
 export default function SearchBar({ onSearch, loading, initialValue = '' }) {
   const { t } = useI18n();
@@ -12,7 +13,9 @@ export default function SearchBar({ onSearch, loading, initialValue = '' }) {
   // so picking a result doesn't immediately reopen the dropdown.
   const skipNextFetch = useRef(false);
 
-  // Debounced autocomplete as the user types.
+  // Instant client-side autocomplete against the bundled TA-125 list, then a
+  // debounced Yahoo search to surface stocks outside the index. The local matches
+  // paint immediately; Yahoo extras merge in a moment later if there's room.
   useEffect(() => {
     if (skipNextFetch.current) {
       skipNextFetch.current = false;
@@ -24,12 +27,23 @@ export default function SearchBar({ onSearch, loading, initialValue = '' }) {
       setOpen(false);
       return;
     }
+    const local = localSearchStocks(q);
+    setResults(local);
+    setOpen(local.length > 0);
+    if (local.length >= 7) return; // local already fills the dropdown
+
+    let cancelled = false;
     const id = setTimeout(async () => {
-      const { results: r } = await searchStocks(q);
-      setResults(r || []);
-      setOpen((r || []).length > 0);
-    }, 350);
-    return () => clearTimeout(id);
+      const { results: remote } = await searchStocks(q);
+      if (cancelled) return;
+      const merged = mergeStockResults(local, remote);
+      setResults(merged);
+      setOpen(merged.length > 0);
+    }, 250);
+    return () => {
+      cancelled = true;
+      clearTimeout(id);
+    };
   }, [query]);
 
   // Close the dropdown when clicking outside the search box.

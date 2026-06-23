@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from 'react';
 import {
   AreaChart,
   Area,
@@ -10,6 +11,12 @@ import {
 import { Link } from 'react-router-dom';
 import { useI18n } from '../i18n/I18nContext.jsx';
 import { useWatchlist } from '../hooks/useWatchlist.js';
+import { fetchHistory } from '../services/api.js';
+
+const RANGES = ['1y', '5y'];
+
+const MONTH_ABBREVS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const monthAbbrev = (isoDate) => MONTH_ABBREVS[Number(isoDate.slice(5, 7)) - 1];
 
 export default function StockCard({ stock }) {
   const { t, lang } = useI18n();
@@ -19,15 +26,69 @@ export default function StockCard({ stock }) {
   const displayName =
     lang === 'he' && stock.companyNameHe ? stock.companyNameHe : stock.companyName;
 
-  const chartData = stock.chartData || [];
+  // Every range (incl. the default 1y) is lazy-loaded via /api/history rather
+  // than bundled with the quote — this keeps the heavy ~250-bar daily series off
+  // the quote's critical path so the card paints immediately and the chart fills
+  // in a beat later. Each range is fetched once then cached in state.
+  const [range, setRange] = useState('1y');
+  const [history, setHistory] = useState({});
+  const [loadingRange, setLoadingRange] = useState(null);
+  const [errorRange, setErrorRange] = useState(null);
+
+  const chartData = history[range] || [];
+
+  const loadRange = async (r) => {
+    setLoadingRange(r);
+    setErrorRange(null);
+    try {
+      const { chartData: data } = await fetchHistory(stock.ticker, r);
+      setHistory((prev) => ({ ...prev, [r]: data }));
+    } catch {
+      setErrorRange(r);
+    } finally {
+      setLoadingRange(null);
+    }
+  };
+
+  // Load the default 1y series on mount, and reset/reload when the card is
+  // reused for a different ticker.
+  useEffect(() => {
+    setRange('1y');
+    setHistory({});
+    setErrorRange(null);
+    loadRange('1y');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stock.ticker]);
+
+  const selectRange = (r) => {
+    if (r === range) return;
+    setRange(r);
+    setErrorRange(null);
+    if (!history[r]) loadRange(r);
+  };
+
   const minPrice = chartData.length ? Math.min(...chartData.map((d) => d.price)) * 0.96 : 0;
   const maxPrice = chartData.length ? Math.max(...chartData.map((d) => d.price)) * 1.04 : 100;
-  // Prefer the full "Jun 2025" label (tooltip + unique category); fall back to the
-  // short month so a backend that hasn't sent `label` yet can't blank the axis.
-  const labelOf = (d) => d.label || d.month;
-  // The last point is the current (partial) month. Keep it plotted and hoverable,
-  // but hide its X-axis tick so the axis doesn't repeat a month name at both ends.
-  const currentLabel = chartData.length ? labelOf(chartData[chartData.length - 1]) : null;
+
+  // Show one X-axis tick per month (1y) or per year (5y) instead of one per
+  // data point — with daily/weekly bars that would overlap into an unreadable
+  // smear. The tooltip still shows the exact day/week via `label`.
+  const tickDates = useMemo(() => {
+    if (!chartData.length) return new Set();
+    const keyOf = (dateStr) =>
+      range === '5y' ? dateStr.slice(0, 4) : dateStr.slice(0, 7);
+    const seen = new Set();
+    const ticks = new Set();
+    for (const d of chartData) {
+      if (!d.date) continue;
+      const key = keyOf(d.date);
+      if (!seen.has(key)) {
+        seen.add(key);
+        ticks.add(d.date);
+      }
+    }
+    return ticks;
+  }, [chartData, range]);
 
   // Color chart based on overall trend across the visible range
   const trendUp =
@@ -70,8 +131,34 @@ export default function StockCard({ stock }) {
         </div>
       </div>
 
-      <div className="chart-title">{t.stock.chartTitle}</div>
+      <div className="chart-header">
+        <div className="chart-title">
+          {range === '1y' ? t.stock.chartTitle1y : t.stock.chartTitle5y}
+        </div>
+        <div className="range-toggle">
+          {RANGES.map((r) => (
+            <button
+              key={r}
+              className={r === range ? 'active' : ''}
+              onClick={() => selectRange(r)}
+            >
+              {loadingRange === r ? '…' : r.toUpperCase()}
+            </button>
+          ))}
+        </div>
+      </div>
       <div className="chart-wrap">
+        {loadingRange === range && (
+          <div className="chart-overlay">{t.stock.chartLoading}</div>
+        )}
+        {errorRange === range && loadingRange !== range && (
+          <div className="chart-overlay">
+            <span>{t.stock.chartError}</span>
+            <button className="chart-retry" onClick={() => loadRange(range)}>
+              {t.stock.chartRetry}
+            </button>
+          </div>
+        )}
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
             <defs>
@@ -86,11 +173,12 @@ export default function StockCard({ stock }) {
               strokeDasharray="3 3"
             />
             <XAxis
-              dataKey={labelOf}
+              dataKey="date"
               tick={{ fill: 'var(--muted)', fontSize: 10, fontFamily: 'IBM Plex Mono' }}
-              tickFormatter={(value) =>
-                value === currentLabel ? '' : String(value).split(' ')[0]
-              }
+              tickFormatter={(date) => {
+                if (!tickDates.has(date)) return '';
+                return range === '5y' ? date.slice(0, 4) : monthAbbrev(date);
+              }}
               axisLine={false}
               tickLine={false}
               dy={4}
@@ -116,6 +204,7 @@ export default function StockCard({ stock }) {
               }}
               labelStyle={{ color: 'var(--muted)', marginBottom: 4, fontSize: 10, letterSpacing: '0.06em' }}
               itemStyle={{ color: chartColor, fontWeight: 600 }}
+              labelFormatter={(label, payload) => payload?.[0]?.payload?.label ?? label ?? ''}
               formatter={(v) => [v.toLocaleString(), 'Price']}
             />
             <Area

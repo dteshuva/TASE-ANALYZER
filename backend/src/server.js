@@ -7,6 +7,7 @@ import quoteRouter from './routes/quote.js';
 import quotesRouter from './routes/quotes.js';
 import searchRouter from './routes/search.js';
 import financialsRouter from './routes/financials.js';
+import historyRouter from './routes/history.js';
 import loginRouter from './routes/login.js';
 import { requireAuth, authEnabled } from './auth.js';
 
@@ -76,6 +77,7 @@ app.use('/api/quotes', quotesRouter);
 app.use('/api/search', searchRouter);
 app.use('/api/analyze', analyzeRouter);
 app.use('/api/financials', financialsRouter);
+app.use('/api/history', historyRouter);
 
 // Error handler. Log full details server-side, but don't leak internal error
 // messages (stack traces, library internals) to clients on 5xx in production.
