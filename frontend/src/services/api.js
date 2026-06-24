@@ -170,7 +170,7 @@ export async function fetchFinancials(ticker) {
 
 // Streams /api/analyze as SSE. Returns a controller with an abort() method.
 // onProgress/onComplete/onError fire as the stream produces events.
-export function streamAnalysis(query, { onProgress, onComplete, onError } = {}) {
+export function streamAnalysis(query, { lang = 'en', onProgress, onComplete, onError } = {}) {
   const controller = new AbortController();
 
   (async () => {
@@ -179,7 +179,7 @@ export function streamAnalysis(query, { onProgress, onComplete, onError } = {}) 
       res = await fetch(`${API_URL}/api/analyze`, {
         method: 'POST',
         headers: authHeaders({ Accept: 'text/event-stream' }),
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({ query, lang }),
         signal: controller.signal,
       });
     } catch (e) {

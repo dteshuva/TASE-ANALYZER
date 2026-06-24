@@ -112,6 +112,7 @@ export const translations = {
     analysis: {
       title: 'AI analysis & prediction',
       poweredBy: 'Powered by Claude',
+      generating: 'Writing analysis…',
       bullish: 'Bullish probability',
       verdict: 'Verdict',
       conviction: {
@@ -311,6 +312,7 @@ export const translations = {
     analysis: {
       title: 'ניתוח ותחזית AI',
       poweredBy: 'מופעל על ידי Claude',
+      generating: 'כותב ניתוח…',
       bullish: 'הסתברות עלייה',
       verdict: 'המלצה',
       conviction: {

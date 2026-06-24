@@ -15,10 +15,10 @@ const keyFor = (s) => `stock:${String(s).trim().toLowerCase()}`;
 
 // Mirrors AnalysisPanel's check — whether a cached stock already carries AI
 // analysis or only the bare quote (it streams in a beat after the quote).
-const hasAnalysis = (s) => Boolean(s?.analysisEn || s?.analysisHe || s?.verdict);
+const hasAnalysis = (s) => Boolean(s?.analysis || s?.verdict);
 
 export default function AnalyzePage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { aiEnabled } = useSettings();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
@@ -26,6 +26,7 @@ export default function AnalyzePage() {
   const [stock, setStock] = useState(null);
   const [loadingQuote, setLoadingQuote] = useState(false);
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
+  const [analysisProgress, setAnalysisProgress] = useState(0);
   const [error, setError] = useState('');
   const [analysisError, setAnalysisError] = useState('');
   const [suggestions, setSuggestions] = useState([]);
@@ -36,9 +37,12 @@ export default function AnalyzePage() {
   // enriched result under every key the stock is stored as. Reused by a fresh
   // fetch and by a cache hit whose analysis hadn't finished before navigation.
   const startAnalysis = useCallback(
-    (query, cacheKeys) => {
+    (query, cacheKeys, reqLang) => {
       setLoadingAnalysis(true);
+      setAnalysisProgress(0);
       streamRef.current = streamAnalysis(query, {
+        lang: reqLang,
+        onProgress: (p) => setAnalysisProgress(p?.received || 0),
         onComplete: (full) => {
           setLoadingAnalysis(false);
           setStock((prev) => {
@@ -74,11 +78,11 @@ export default function AnalyzePage() {
       if (cached) {
         setStock(cached);
         setLoadingQuote(false);
-        // The quote was cached but the AI stream may have been aborted when the
-        // user navigated away before it finished — fill it in now without
-        // blocking the (already-painted) page.
-        if (aiEnabled && !hasAnalysis(cached)) {
-          startAnalysis(query, [queryKey, keyFor(cached.ticker)]);
+        // Re-stream the analysis if it's missing (aborted before it finished) or
+        // was generated in a different language than the one now selected — the
+        // backend only produces one language per request.
+        if (aiEnabled && (!hasAnalysis(cached) || cached.lang !== lang)) {
+          startAnalysis(query, [queryKey, keyFor(cached.ticker)], lang);
         }
         return;
       }
@@ -110,9 +114,9 @@ export default function AnalyzePage() {
         return;
       }
 
-      startAnalysis(query, cacheKeys);
+      startAnalysis(query, cacheKeys, lang);
     },
-    [setSearchParams, t, aiEnabled, startAnalysis]
+    [setSearchParams, t, aiEnabled, startAnalysis, lang]
   );
 
   useEffect(() => {
@@ -121,6 +125,17 @@ export default function AnalyzePage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // When the UI language changes after an analysis has loaded, regenerate it in
+  // the new language (the backend caches per-language, so subsequent toggles are
+  // fast). The bare quote is kept — only the AI narrative is re-streamed.
+  useEffect(() => {
+    if (!stock || !aiEnabled || !hasAnalysis(stock) || stock.lang === lang) return;
+    streamRef.current?.abort();
+    const q = searchParams.get('q') || stock.ticker;
+    startAnalysis(stock.ticker, [keyFor(q), keyFor(stock.ticker)], lang);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
 
   useEffect(() => () => streamRef.current?.abort(), []);
 
@@ -178,6 +193,7 @@ export default function AnalyzePage() {
               <AnalysisPanel
                 stock={stock}
                 loading={loadingAnalysis}
+                progress={analysisProgress}
                 error={analysisError}
               />
             </div>

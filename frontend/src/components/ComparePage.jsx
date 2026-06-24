@@ -129,8 +129,8 @@ function CmpRow({ label, a, b, winner }) {
 
 function AiColumn({ stock, t, lang }) {
   const verdictClass = stock.verdict?.toLowerCase() || 'hold';
-  const risks = lang === 'he' ? stock.keyRisksHe : stock.keyRisks;
-  const catalysts = lang === 'he' ? stock.catalystsHe : stock.catalysts;
+  const risks = stock.keyRisks;
+  const catalysts = stock.catalysts;
   return (
     <div className="cmp-ai-col">
       <div className="cmp-ai-head">
@@ -166,12 +166,16 @@ export default function ComparePage() {
   const [loading, setLoading] = useState({ A: false, B: false });
   const [errors, setErrors] = useState({ A: '', B: '' });
   const streamRefs = useRef({ A: null, B: null });
+  // Remember each side's last query so a language toggle can regenerate the AI
+  // narrative (the backend produces one language per request).
+  const queriesRef = useRef({ A: null, B: null });
 
   const patch = (setter, side, val) =>
     setter((prev) => ({ ...prev, [side]: typeof val === 'function' ? val(prev[side]) : val }));
 
   const load = useCallback(
     async (side, query) => {
+      queriesRef.current[side] = query;
       streamRefs.current[side]?.abort();
       patch(setErrors, side, '');
       patch(setStocks, side, null);
@@ -194,6 +198,7 @@ export default function ComparePage() {
       }
 
       streamRefs.current[side] = streamAnalysis(query, {
+        lang,
         onComplete: (full) => {
           patch(setLoading, side, false);
           patch(setStocks, side, (prev) => ({ ...(prev || {}), ...full, chartData: full.chartData || prev?.chartData }));
@@ -203,13 +208,34 @@ export default function ComparePage() {
         },
       });
     },
-    [t, aiEnabled]
+    [t, aiEnabled, lang]
   );
 
   useEffect(() => () => {
     streamRefs.current.A?.abort();
     streamRefs.current.B?.abort();
   }, []);
+
+  // Regenerate each loaded side's AI narrative when the UI language changes.
+  useEffect(() => {
+    if (!aiEnabled) return;
+    ['A', 'B'].forEach((side) => {
+      const s = stocks[side];
+      const q = queriesRef.current[side];
+      if (!s || !s.verdict || !q || s.lang === lang) return;
+      streamRefs.current[side]?.abort();
+      patch(setLoading, side, true);
+      streamRefs.current[side] = streamAnalysis(q, {
+        lang,
+        onComplete: (full) => {
+          patch(setLoading, side, false);
+          patch(setStocks, side, (prev) => ({ ...(prev || {}), ...full, chartData: full.chartData || prev?.chartData }));
+        },
+        onError: () => patch(setLoading, side, false),
+      });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
 
   const A = stocks.A;
   const B = stocks.B;

@@ -48,21 +48,25 @@ The JSON must contain exactly these fields:
   "pe": string (P/E ratio or "N/A" — use EXACT value from "Current market data"),
   "high52": number (52-week high in AGOROT — use EXACT value from "Current market data"),
   "low52": number (52-week low in AGOROT — use EXACT value from "Current market data"),
-  "analysisEn": string (2-3 paragraph English analysis: business outlook, key risks, near-term catalysts),
-  "analysisHe": string (2-3 paragraph Hebrew analysis covering the same ground),
+  "analysis": string (2-3 paragraph analysis in the OUTPUT LANGUAGE: business outlook, key risks, near-term catalysts),
   "bullishPct": number (0-100, your estimated probability of price increase over 12 months),
   "verdict": "BUY" | "HOLD" | "SELL",
   "reasoningFactors": [
-    { "factor": string, "factorHe": string, "lean": "bullish" | "bearish" | "neutral", "note": string, "noteHe": string },
+    { "factor": string, "lean": "bullish" | "bearish" | "neutral", "note": string },
     ... (3 to 5 items)
   ],
   "targetBear": number (conservative 12-month price target in AGOROT),
   "targetBull": number (optimistic 12-month price target in AGOROT),
-  "keyRisks": [string, string, string] (3 short bullet points in English),
-  "keyRisksHe": [string, string, string] (3 short bullet points in Hebrew),
-  "catalysts": [string, string, string] (3 short bullet points in English),
-  "catalystsHe": [string, string, string] (3 short bullet points in Hebrew)
+  "keyRisks": [string, string, string] (3 short bullet points in the OUTPUT LANGUAGE),
+  "catalysts": [string, string, string] (3 short bullet points in the OUTPUT LANGUAGE)
 }
+
+OUTPUT LANGUAGE
+The user message ends with an "Output language:" directive (English or Hebrew). Write "analysis", every
+reasoningFactors "factor" and "note", "keyRisks", and "catalysts" in THAT language only — do not produce a
+second-language copy. "companyName" is always the English name and "companyNameHe" is always natural Hebrew,
+regardless of the output language. When the output language is Hebrew, all narrative must be natural, fluent
+Hebrew — never transliteration.
 
 UNITS AND PRICING
 On TASE, prices are quoted in agorot (ILA), not shekels. 1 shekel = 100 agorot.
@@ -117,8 +121,8 @@ in it, and each such factor's "note" MUST cite a specific number from it (e.g. "
 expanded to 8.2% from -9.9% over two years", "Net Debt/EBITDA 4.3x is elevated", "FCF margin only
 6.7%", "Q1 revenue +12% YoY") — do not lean only on price action and P/E. Distinguish level from
 trajectory: a metric can be weak in absolute terms yet improving, or strong yet deteriorating —
-say which. For each factor, set "lean" to "bullish", "bearish", or "neutral", and write a "note" /
-"noteHe" that is concrete and quantified — ≤ 16 words, no generic filler.
+say which. For each factor, set "lean" to "bullish", "bearish", or "neutral", and write a "note"
+(in the output language) that is concrete and quantified — ≤ 16 words, no generic filler.
 "bullishPct" and "verdict" MUST be a synthesis of these factors, not picked first and justified
 after the fact. If most factors lean bullish, bullishPct should be meaningfully above 50, and
 vice versa. The factor list is what a user will see as the "why" behind your number — it must
@@ -141,13 +145,13 @@ sheet health (leverage, coverage, liquidity) and cash generation (FCF), then con
 valuation (does the current P/E look cheap or rich GIVEN these fundamentals?). Quote actual
 figures — e.g. "revenue grew 9% YoY to ₪24B as net margin reached 40.9%, but Net Debt/EBITDA of
 4.3x limits flexibility" — never speak only in generalities. Be realistic and nuanced; flag where
-fundamentals and price disagree. Hebrew text must be natural Hebrew, not transliteration. Each
-"analysisEn" / "analysisHe" should be 2-3 short paragraphs, not a single block.
+fundamentals and price disagree. When the output language is Hebrew, the text must be natural
+Hebrew, not transliteration. "analysis" should be 2-3 short paragraphs, not a single block.
 
 KEY RISKS / CATALYSTS
 Exactly 3 items each. Short — each item ≤ 12 words. Specific to the company, not generic
 ("competition" alone is not acceptable; "intensifying Chinese generics competition in oncology" is).
-Hebrew bullets must mirror the English ones in meaning but be natural Hebrew phrasings.
+Write them in the output language; when Hebrew, use natural Hebrew phrasings, not transliteration.
 
 DISCLAIMERS
 Do NOT include disclaimers, hedging boilerplate, or "this is not financial advice" notes inside
@@ -181,10 +185,15 @@ Final reminder: output ONLY the JSON object. No \`\`\`json fences, no leading te
 // Merges AI-derived analysis fields with a fresh price snapshot. `analysis` is
 // either freshly parsed from Claude or pulled from the cache; `realPriceData`
 // is always live, so price/market-cap shown are never stale even on a cache hit.
-function buildResult(analysis, realPriceData, cached) {
+function buildResult(analysis, realPriceData, cached, lang) {
   return {
     ...analysis,
     cached,
+    lang,
+    // Always keep the resolved ".TA" ticker from live data — the model's JSON
+    // returns the bare symbol (e.g. "TEVA"), which would otherwise overwrite it
+    // and break the chart reload, the financials link, and watchlist keying.
+    ticker: realPriceData.ticker,
     companyName: realPriceData.longName || realPriceData.shortName || analysis.companyName,
     sector: realPriceData.sector ?? analysis.sector,
     industry: realPriceData.industry ?? null,
@@ -394,6 +403,10 @@ function summarizeFinancials(record, { sector } = {}) {
 router.post('/', async (req, res, next) => {
   try {
     const { query } = req.body || {};
+    // Output language for the AI narrative. We only generate one language per
+    // request (halves output tokens vs the old bilingual payload); the frontend
+    // re-requests the other language on demand. Cache is keyed by ticker+lang.
+    const lang = req.body?.lang === 'he' ? 'he' : 'en';
 
     if (!query || typeof query !== 'string' || query.length > 100) {
       return res.status(400).json({ error: 'Invalid query' });
@@ -432,11 +445,11 @@ router.post('/', async (req, res, next) => {
 
     // Cache is keyed by the resolved ticker, not the raw search string, so
     // "TEVA" and "teva pharmaceutical" share one cached analysis.
-    const cacheKey = realPriceData.ticker.toLowerCase();
+    const cacheKey = `${realPriceData.ticker.toLowerCase()}:${lang}`;
     const cachedAnalysis = getCached(cacheKey);
 
     if (cachedAnalysis) {
-      sendEvent('complete', buildResult(cachedAnalysis, realPriceData, true));
+      sendEvent('complete', buildResult(cachedAnalysis, realPriceData, true, lang));
       return res.end();
     }
 
@@ -466,7 +479,8 @@ router.post('/', async (req, res, next) => {
       console.error('[financials fetch error]', financialsErr.message);
     }
 
-    const userMessage = `Analyze this TASE stock: ${query}\n\nCurrent market data (as of ${new Date(realPriceData.timestamp).toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' })}):\n${priceInfo}\n\nThe "Company" field above is the authoritative TASE-listed company for this ticker — do NOT confuse it with similarly-named tickers on other exchanges.${financialsSummary ? `\n\n${financialsSummary}` : ''}`;
+    const outputLanguage = lang === 'he' ? 'Hebrew' : 'English';
+    const userMessage = `Analyze this TASE stock: ${query}\n\nCurrent market data (as of ${new Date(realPriceData.timestamp).toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' })}):\n${priceInfo}\n\nThe "Company" field above is the authoritative TASE-listed company for this ticker — do NOT confuse it with similarly-named tickers on other exchanges.${financialsSummary ? `\n\n${financialsSummary}` : ''}\n\nOutput language: ${outputLanguage}`;
 
     let buffer = '';
     let tokensReceived = 0;
@@ -513,7 +527,7 @@ router.post('/', async (req, res, next) => {
     }
 
     setCached(cacheKey, parsed);
-    sendEvent('complete', buildResult(parsed, realPriceData, false));
+    sendEvent('complete', buildResult(parsed, realPriceData, false, lang));
     res.end();
   } catch (err) {
     if (!res.headersSent) {

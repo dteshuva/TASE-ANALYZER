@@ -1,9 +1,23 @@
+import { useState, useEffect } from 'react';
 import { useI18n } from '../i18n/I18nContext.jsx';
 
-export default function AnalysisPanel({ stock, loading, error }) {
-  const { t, lang } = useI18n();
+export default function AnalysisPanel({ stock, loading, progress = 0, error }) {
+  const { t } = useI18n();
 
-  const hasAnalysis = stock?.analysisEn || stock?.analysisHe || stock?.verdict;
+  // Live "still working" feedback — the AI response streams as one JSON object
+  // that can't render until complete, so without this the skeleton looks frozen.
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    if (!loading) {
+      setElapsed(0);
+      return;
+    }
+    const start = Date.now();
+    const id = setInterval(() => setElapsed(Math.floor((Date.now() - start) / 1000)), 1000);
+    return () => clearInterval(id);
+  }, [loading]);
+
+  const hasAnalysis = stock?.analysis || stock?.verdict;
 
   if (error) {
     return (
@@ -24,7 +38,10 @@ export default function AnalysisPanel({ stock, loading, error }) {
         </div>
         <div className="analysis-loading-row">
           <div className="spinner spinner-sm" />
-          <div className="loading-text">{t.states.loading}</div>
+          <div className="loading-text">
+            {progress > 0 ? t.analysis.generating : t.states.loading}
+            {elapsed > 0 ? ` · ${elapsed}s` : ''}
+          </div>
         </div>
         <div className="analysis-skeleton">
           <div className="skeleton-line" />
@@ -41,9 +58,9 @@ export default function AnalysisPanel({ stock, loading, error }) {
     );
   }
 
-  const analysisText = lang === 'he' ? stock.analysisHe : stock.analysisEn;
-  const risks = lang === 'he' ? stock.keyRisksHe : stock.keyRisks;
-  const catalysts = lang === 'he' ? stock.catalystsHe : stock.catalysts;
+  const analysisText = stock.analysis;
+  const risks = stock.keyRisks;
+  const catalysts = stock.catalysts;
 
   const verdictClass = stock.verdict?.toLowerCase() || 'hold';
   const verdictLabel = t.verdicts[stock.verdict] || stock.verdict;
@@ -100,9 +117,9 @@ export default function AnalysisPanel({ stock, loading, error }) {
                   <span className="factor-chip-arrow">
                     {f.lean === 'bullish' ? '▲' : f.lean === 'bearish' ? '▼' : '●'}
                   </span>
-                  <span className="factor-chip-name">{lang === 'he' ? f.factorHe : f.factor}</span>
+                  <span className="factor-chip-name">{f.factor}</span>
                 </div>
-                <div className="factor-chip-note">{lang === 'he' ? f.noteHe : f.note}</div>
+                <div className="factor-chip-note">{f.note}</div>
               </div>
             ))}
           </div>
