@@ -166,7 +166,9 @@ async function doFetchStock(formattedTicker) {
   let result;
   try {
     result = await withRetry(() =>
-      yf.quoteSummary(formattedTicker, { modules: ['price', 'summaryDetail', 'assetProfile'] })
+      yf.quoteSummary(formattedTicker, {
+        modules: ['price', 'summaryDetail', 'assetProfile', 'defaultKeyStatistics', 'financialData'],
+      })
     );
   } catch (err) {
     const notFound = /not found|no fundamentals/i.test(err.message);
@@ -178,6 +180,8 @@ async function doFetchStock(formattedTicker) {
   const price = result.price || {};
   const summary = result.summaryDetail || {};
   const profile = result.assetProfile || {};
+  const keyStats = result.defaultKeyStatistics || {};
+  const financialData = result.financialData || {};
 
   // Prices from Yahoo Finance for TASE are in ILA (agorot).
   return {
@@ -195,11 +199,21 @@ async function doFetchStock(formattedTicker) {
     avgVolume: summary.averageVolume ?? summary.averageDailyVolume3Month ?? null,
     // Yahoo reports dividendYield as a decimal fraction (e.g. 0.0372 = 3.72%).
     dividendYield: summary.dividendYield ?? null,
+    exDividendDate: summary.exDividendDate ?? null,
     // Sourced sector/industry from Yahoo (GICS) — far more reliable than the
     // AI-guessed sector, especially for Israel-only names.
     sector: profile.sector ?? null,
     industry: profile.industry ?? null,
     pe: summary.trailingPE != null ? +summary.trailingPE.toFixed(2) : null,
+    forwardPE: summary.forwardPE != null ? +summary.forwardPE.toFixed(2) : null,
+    beta: keyStats.beta ?? null,
+    eps: keyStats.trailingEps ?? null,
+    totalRevenue: financialData.totalRevenue ?? null,
+    netIncome: keyStats.netIncomeToCommon ?? null,
+    open: price.regularMarketOpen ?? null,
+    previousClose: price.regularMarketPreviousClose ?? summary.previousClose ?? null,
+    dayHigh: price.regularMarketDayHigh ?? null,
+    dayLow: price.regularMarketDayLow ?? null,
     currency: 'ILA',
     timestamp: new Date().toISOString(),
     source: 'yahoo-finance',

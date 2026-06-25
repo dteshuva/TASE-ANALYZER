@@ -47,7 +47,7 @@
   "Technology": {
     "sector": "Technology",
     "label": "Technology",
-    "computedAt": 1782148624821,
+    "computedAt": 1782405416667,
     "window": {
       "months": 12
     },
@@ -58,66 +58,66 @@
       {
         "ticker": "NVMI",
         "weight": 31.23,
-        "return": 110.2
+        "return": 79.1
       },
       {
         "ticker": "NICE",
         "weight": 10.12,
-        "return": -54.4
+        "return": -53.8
       },
       {
         "ticker": "CAMT",
         "weight": 9.47,
-        "return": 128.1
+        "return": 76.7
       },
       {
         "ticker": "MTRX",
         "weight": 2.59,
-        "return": -31.7
+        "return": -36.3
       },
       {
         "ticker": "HLAN",
         "weight": 2.18,
-        "return": -26.1
+        "return": -30.7
       },
       {
         "ticker": "GILT",
         "weight": 1.98,
-        "return": 62
+        "return": 44.8
       },
       {
         "ticker": "QLTU",
         "weight": 1.75,
-        "return": 57
+        "return": 34.1
       },
       {
         "ticker": "FORTY",
         "weight": 1.71,
-        "return": -21.7
+        "return": -28.3
       },
       {
         "ticker": "ONE",
         "weight": 1.67,
-        "return": -26.9
+        "return": -31.2
       },
       {
         "ticker": "NYAX",
         "weight": 1.51,
-        "return": 16
+        "return": 20.9
       },
       {
         "ticker": "PRTC",
         "weight": 1.26,
-        "return": 114.2
+        "return": 67.5
       }
     ],
-    "return12m": 65.3,
+    "return12m": 40.6,
     "series": null
   },
   "Health Care": {
     "sector": "Health Care",
     "label": "Health Care",
-    "computedAt": 1782241573739,
+    "computedAt": 1782361618069,
     "window": {
       "months": 12
     },
@@ -128,15 +128,15 @@
       {
         "ticker": "TEVA",
         "weight": 98.96,
-        "return": 66.6
+        "return": 71.7
       },
       {
         "ticker": "OPK",
         "weight": 1.04,
-        "return": -2.1
+        "return": 1.8
       }
     ],
-    "return12m": 65.9,
+    "return12m": 71,
     "series": null
   },
   "Industrials": {

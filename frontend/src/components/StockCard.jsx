@@ -13,10 +13,36 @@ import { useI18n } from '../i18n/I18nContext.jsx';
 import { useWatchlist } from '../hooks/useWatchlist.js';
 import { fetchHistory } from '../services/api.js';
 
-const RANGES = ['1y', '5y'];
+const RANGES = ['1m', '3m', '6m', 'ytd', '1y', '5y'];
+
+// Sub-year ranges are sliced client-side from the 1y daily series already
+// loaded on mount, instead of a separate fetch — they're strict subsets of
+// data we already have, so slicing is both free and instant to switch to.
+const SLICED_RANGES = new Set(['1m', '3m', '6m', 'ytd']);
+
+function sliceRange(daily, range) {
+  if (!daily.length) return [];
+  const cutoff = new Date();
+  if (range === '1m') cutoff.setMonth(cutoff.getMonth() - 1);
+  else if (range === '3m') cutoff.setMonth(cutoff.getMonth() - 3);
+  else if (range === '6m') cutoff.setMonth(cutoff.getMonth() - 6);
+  else if (range === 'ytd') {
+    cutoff.setMonth(0);
+    cutoff.setDate(1);
+  }
+  const cutoffStr = cutoff.toISOString().slice(0, 10);
+  return daily.filter((d) => d.date >= cutoffStr);
+}
 
 const MONTH_ABBREVS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const monthAbbrev = (isoDate) => MONTH_ABBREVS[Number(isoDate.slice(5, 7)) - 1];
+
+function formatLargeCurrency(value) {
+  const abs = Math.abs(value);
+  if (abs >= 1e9) return `₪${(value / 1e9).toFixed(1)}B`;
+  if (abs >= 1e6) return `₪${(value / 1e6).toFixed(1)}M`;
+  return `₪${value.toLocaleString()}`;
+}
 
 export default function StockCard({ stock }) {
   const { t, lang } = useI18n();
@@ -35,7 +61,12 @@ export default function StockCard({ stock }) {
   const [loadingRange, setLoadingRange] = useState(null);
   const [errorRange, setErrorRange] = useState(null);
 
-  const chartData = history[range] || [];
+  // Sliced ranges piggyback on the 1y fetch, so their loading/error state is
+  // whatever the 1y request is doing.
+  const loadKey = SLICED_RANGES.has(range) ? '1y' : range;
+  const chartData = SLICED_RANGES.has(range)
+    ? sliceRange(history['1y'] || [], range)
+    : history[range] || [];
 
   const loadRange = async (r) => {
     setLoadingRange(r);
@@ -64,7 +95,11 @@ export default function StockCard({ stock }) {
     if (r === range) return;
     setRange(r);
     setErrorRange(null);
-    if (!history[r]) loadRange(r);
+    if (SLICED_RANGES.has(r)) {
+      if (!history['1y']) loadRange('1y');
+    } else if (!history[r]) {
+      loadRange(r);
+    }
   };
 
   const minPrice = chartData.length ? Math.min(...chartData.map((d) => d.price)) * 0.96 : 0;
@@ -75,8 +110,18 @@ export default function StockCard({ stock }) {
   // smear. The tooltip still shows the exact day/week via `label`.
   const tickDates = useMemo(() => {
     if (!chartData.length) return new Set();
-    const keyOf = (dateStr) =>
-      range === '5y' ? dateStr.slice(0, 4) : dateStr.slice(0, 7);
+    // One tick per week for the short ranges (too few days for a monthly tick
+    // to be useful), per month for 1y, per year for 5y.
+    const keyOf =
+      range === '5y'
+        ? (dateStr) => dateStr.slice(0, 4)
+        : range === '1m' || range === '3m'
+        ? (dateStr) => {
+            const d = new Date(dateStr);
+            const week = Math.floor(d.getDate() / 7);
+            return `${dateStr.slice(0, 7)}-w${week}`;
+          }
+        : (dateStr) => dateStr.slice(0, 7);
     const seen = new Set();
     const ticks = new Set();
     for (const d of chartData) {
@@ -133,7 +178,7 @@ export default function StockCard({ stock }) {
 
       <div className="chart-header">
         <div className="chart-title">
-          {range === '1y' ? t.stock.chartTitle1y : t.stock.chartTitle5y}
+          {range === '5y' ? t.stock.chartTitle5y : t.stock.chartTitle1y}
         </div>
         <div className="range-toggle">
           {RANGES.map((r) => (
@@ -142,19 +187,19 @@ export default function StockCard({ stock }) {
               className={r === range ? 'active' : ''}
               onClick={() => selectRange(r)}
             >
-              {loadingRange === r ? '…' : r.toUpperCase()}
+              {loadingRange === (SLICED_RANGES.has(r) ? '1y' : r) ? '…' : r.toUpperCase()}
             </button>
           ))}
         </div>
       </div>
       <div className="chart-wrap">
-        {loadingRange === range && (
+        {loadingRange === loadKey && (
           <div className="chart-overlay">{t.stock.chartLoading}</div>
         )}
-        {errorRange === range && loadingRange !== range && (
+        {errorRange === loadKey && loadingRange !== loadKey && (
           <div className="chart-overlay">
             <span>{t.stock.chartError}</span>
-            <button className="chart-retry" onClick={() => loadRange(range)}>
+            <button className="chart-retry" onClick={() => loadRange(loadKey)}>
               {t.stock.chartRetry}
             </button>
           </div>
@@ -177,7 +222,11 @@ export default function StockCard({ stock }) {
               tick={{ fill: 'var(--muted)', fontSize: 10, fontFamily: 'IBM Plex Mono' }}
               tickFormatter={(date) => {
                 if (!tickDates.has(date)) return '';
-                return range === '5y' ? date.slice(0, 4) : monthAbbrev(date);
+                if (range === '5y') return date.slice(0, 4);
+                if (range === '1m' || range === '3m') {
+                  return `${monthAbbrev(date)} ${Number(date.slice(8, 10))}`;
+                }
+                return monthAbbrev(date);
               }}
               axisLine={false}
               tickLine={false}
@@ -270,8 +319,25 @@ export default function StockCard({ stock }) {
       )}
 
       <div className="metrics">
+        {stock.previousClose != null && (
+          <Metric label={t.stock.previousClose} value={stock.previousClose.toLocaleString()} />
+        )}
+        {stock.dayLow != null && stock.dayHigh != null && (
+          <Metric
+            label={t.stock.dayRange}
+            value={`${stock.dayLow.toLocaleString()} – ${stock.dayHigh.toLocaleString()}`}
+          />
+        )}
         <Metric label={t.stock.marketCap} value={stock.marketCap} />
         <Metric label={t.stock.pe} value={stock.pe} />
+        {stock.beta != null && <Metric label={t.stock.beta} value={stock.beta.toFixed(2)} />}
+        {stock.eps != null && <Metric label={t.stock.eps} value={stock.eps.toFixed(2)} />}
+        {stock.totalRevenue != null && (
+          <Metric label={t.stock.totalRevenue} value={formatLargeCurrency(stock.totalRevenue)} />
+        )}
+        {stock.netIncome != null && (
+          <Metric label={t.stock.netIncome} value={formatLargeCurrency(stock.netIncome)} />
+        )}
         <Metric label={t.stock.high52} value={stock.high52?.toLocaleString?.() ?? stock.high52} />
         <Metric label={t.stock.low52} value={stock.low52?.toLocaleString?.() ?? stock.low52} />
         <Metric label={t.stock.volume} value={stock.volume != null ? stock.volume.toLocaleString() : null} />
@@ -280,6 +346,16 @@ export default function StockCard({ stock }) {
         )}
         {stock.dividendYield != null && (
           <Metric label={t.stock.dividendYield} value={(stock.dividendYield * 100).toFixed(2) + '%'} />
+        )}
+        {stock.exDividendDate && (
+          <Metric
+            label={t.stock.exDividendDate}
+            value={new Date(stock.exDividendDate).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+            })}
+          />
         )}
       </div>
 
