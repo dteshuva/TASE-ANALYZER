@@ -135,6 +135,11 @@ export default function StockCard({ stock }) {
     return ticks;
   }, [chartData, range]);
 
+  // Baseline = first visible bar of the selected range. The tooltip shows the
+  // return relative to it, so hovering reads as "return since the start of
+  // this window" instead of requiring the user to do the arithmetic.
+  const baselinePrice = chartData.length ? chartData[0].price : null;
+
   // Color chart based on overall trend across the visible range
   const trendUp =
     chartData.length >= 2
@@ -254,7 +259,11 @@ export default function StockCard({ stock }) {
               labelStyle={{ color: 'var(--muted)', marginBottom: 4, fontSize: 10, letterSpacing: '0.06em' }}
               itemStyle={{ color: chartColor, fontWeight: 600 }}
               labelFormatter={(label, payload) => payload?.[0]?.payload?.label ?? label ?? ''}
-              formatter={(v) => [v.toLocaleString(), 'Price']}
+              formatter={(v) => {
+                const pct = baselinePrice ? ((v / baselinePrice - 1) * 100) : null;
+                const pctStr = pct != null ? `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%` : null;
+                return [pctStr ? `${v.toLocaleString()} (${pctStr})` : v.toLocaleString(), 'Price'];
+              }}
             />
             <Area
               type="monotone"
